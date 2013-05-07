@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class Lamps extends Plugin {
 
     Set<Lamp> lamps = Sets.newTreeSet();
-    private static final Logger LOGGER = Logger.getLogger(Lamps.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
     public Set<Lamp> findLamps() {
         ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
