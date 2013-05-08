@@ -8,10 +8,14 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("UnusedDeclaration")
 @Extension
 public class XfManagementLink extends ManagementLink {
+
+    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
     private final Jenkins jenkins = Jenkins.getInstance();
 
@@ -43,13 +47,16 @@ public class XfManagementLink extends ManagementLink {
     @JavaScriptMethod
     public boolean changeLampName(String macAddress, String name) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
-        Set<Lamp> lamps = plugin.findLamps();
+        Set<Lamp> lamps = plugin.getLamps();
+        LOGGER.log(Level.INFO, "MAC to find: " + macAddress);
         for (Lamp lamp : lamps) {
+            LOGGER.log(Level.INFO, "Checking: " + lamp.getMacAddress());
             if (lamp.getMacAddress().equals(macAddress)) {
                 lamp.setName(name);
                 return true;
             }
         }
+        LOGGER.log(Level.WARNING, "Could not find lamp: " + macAddress + ' ' + name);
         return false;
     }
 

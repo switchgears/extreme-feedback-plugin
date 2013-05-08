@@ -2,12 +2,14 @@ package org.jenkinsci.plugins.extremefeedback;
 
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.*;
+import static com.google.common.collect.Sets.difference;
 import hudson.Plugin;
 import org.jenkinsci.plugins.extremefeedback.model.Lamp;
 import org.jenkinsci.plugins.extremefeedback.model.LampFinderCallable;
 
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Lamps extends Plugin {
@@ -20,7 +22,16 @@ public class Lamps extends Plugin {
         ListenableFuture<Set<Lamp>> listenableFuture = service.submit(new LampFinderCallable());
         Futures.addCallback(listenableFuture, new FutureCallback<Set<Lamp>>() {
             public void onSuccess(Set<Lamp> l) {
-                lamps = l;
+                if (lamps.isEmpty()){
+                    lamps = l;
+                }
+                else {
+                    Set<Lamp> diff = difference(l, lamps);
+                    for (Lamp lamp : diff) {
+                        LOGGER.log(Level.INFO, "New lamp found: " + lamp.getMacAddress());
+                        lamps.add(lamp);
+                    }
+                }
             }
 
             public void onFailure(Throwable throwable) {

@@ -1,4 +1,8 @@
 function drawLampsTable(lamps) {
+    var lampsTable = document.getElementById("lamps-table");
+    // Delete lamps and add again
+    lampsTable.innerHTML = "";
+
     for (var i = 0; i < lamps.length; i++) {
         var tr = document.createElement('tr');
 
@@ -17,32 +21,34 @@ function drawLampsTable(lamps) {
         tr.appendChild(ipTd);
 
         var nameTd = document.createElement('td');
-        nameTd.innerHTML = '<span id="lamp-name-' + mac + '">' + name + '</span> <button onclick="changeLampName(\'' + mac + '\');">edit</button>';
+        nameTd.innerHTML = '<span id="lamp-name-' + mac + '">' + name + '</span> <button onclick="changeLampName(\'' + mac + '\',\'' + name + '\');">edit</button>';
         tr.appendChild(nameTd);
 
         var jobsTd = document.createElement('td');
         jobsTd.innerHTML = jobs;
         tr.appendChild(jobsTd);
 
-        var lampsTable = document.getElementById("lamps-table");
-        lampsTable.innerHTML = "";
         lampsTable.appendChild(tr);
+
     }
 }
 
 function saveLampJobAssociation(project, macAddress) {
     var checkbox = document.getElementById("lamp-" + macAddress + "-" + project);
-    var checked = checkbox.checked === "yes" ? true : false;
-    if (checked) {
-        it.addProjectToLamp(
-            project,
-            macAddress,
-            notificationBar.show('Job added to lamp', notificationBar.OK));
+    if (checkbox){
+        var checked = checkbox.checked;
+        if (checked) {
+            it.addProjectToLamp(
+                project,
+                macAddress,
+                notificationBar.show('Job added to lamp', notificationBar.OK));
+        } else {
+            it.removeProjectFromLamp(
+                project,
+                macAddress,
+                notificationBar.show('Job removed from lamp', notificationBar.OK));
+        }
     } else {
-        it.removeProjectFromLamp(
-            project,
-            macAddress,
-            notificationBar.show('Job removed from lamp', notificationBar.OK));
     }
 }
 
@@ -53,11 +59,20 @@ function drawLampsJobsTable(lamps) {
         var projects = t.responseObject();
 
         var tr = document.createElement('tr');
+        var projectNameCell = document.createElement('th');
+        projectNameCell.innerHTML = "Job";
+        tr.appendChild(projectNameCell);
         for (var i = 0; i < lamps.length; i++) {
             var lampNameCell = document.createElement('th');
-            lampNameCell.innerHTML = lamps[i].name;
+            lampName = lamps[i].name;
+            if (!lampName){
+                lampName = lamps[i].macAddress;
+            }
+            lampNameCell.innerHTML = lampName;
+
             tr.appendChild(lampNameCell);
         }
+        table.appendChild(tr);
 
         for (var i = 0; i < projects.length; i++) {
             var tr = document.createElement('tr');
@@ -70,9 +85,9 @@ function drawLampsJobsTable(lamps) {
                 var cell = document.createElement('td');
                 var checkbox = document.createElement('input');
                 checkbox.type = "checkbox";
-                checkbox.checked = lamps.jobs.indexOf(projects[i]) > -1 ? "yes" : "no";
-                checkbox.id = "lamp-" + lamp.macAddress + "-" + projects[i];
-                checkbox.onclick = saveLampJobAssociation(projects[i], lamps[j].macAddress);
+                checkbox.checked = lamps[j].jobs.indexOf(projects[i]) > -1 ? true : false;
+                checkbox.id = "lamp-" + lamps[j].macAddress + "-" + projects[i];
+                checkbox.setAttribute("onclick", "saveLampJobAssociation('" + projects[i] + "', '" + lamps[j].macAddress + "')" );
                 cell.appendChild(checkbox);
                 tr.appendChild(cell);
             }

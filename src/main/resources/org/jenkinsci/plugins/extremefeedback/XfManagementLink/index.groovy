@@ -30,7 +30,7 @@ l.layout() {
         }
 
         div {
-            table(class:"pane") {
+            table(class:"pane", style: "text-align: left") {
                 thead {
                     tr {
                         th {
@@ -53,7 +53,7 @@ l.layout() {
         }
 
         div {
-            table(class: "pane", id: "lamp-job") {
+            table(class: "pane", id: "lamp-job", style: "text-align: left") {
             }
         }
 
