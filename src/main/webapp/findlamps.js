@@ -54,6 +54,7 @@ function saveLampJobAssociation(project, macAddress) {
 
 function drawLampsJobsTable(lamps) {
     var table = document.getElementById("lamp-job");
+    table.innerHTML = "";
 
     it.getProjects(function(t) {
         var projects = t.responseObject();
