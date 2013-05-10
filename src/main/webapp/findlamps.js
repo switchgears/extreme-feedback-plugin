@@ -42,6 +42,12 @@ function updateLampTable(project, mac){
     });
 
 }
+
+function updateJobTableHeader(mac, name){
+    var lampTH = document.getElementById("lamp-job-name-" + mac);
+    lampTH.innerHTML = '<span id="lamp-job-name-' + mac + '">' + name + '</span>';
+}
+
 function updateLampJobsView(project, mac){
     saveLampJobAssociation(project, mac);
     updateLampTable(project, mac);
@@ -83,7 +89,7 @@ function drawLampsJobsTable(lamps) {
             if (!lampName){
                 lampName = lamps[i].macAddress;
             }
-            lampNameCell.innerHTML = lampName;
+            lampNameCell.innerHTML = '<span id="lamp-job-name-' + lamps[i].macAddress + '">' + lampName + '</span>';
 
             tr.appendChild(lampNameCell);
         }
@@ -120,6 +126,10 @@ function changeLampName(mac, oldName) {
             if(result) {
                 nameSpan = document.getElementById("lamp-name-" + mac);
                 nameSpan.innerHTML = name;
+                updateJobTableHeader(mac, name);
+                // Update button, Two next sibling due to space between name and button
+                button = nameSpan.nextSibling.nextSibling;
+                button.setAttribute("onclick", "changeLampName('" + mac + "','" + name + "')");
                 notificationBar.show('Lamp name changed successfully',notificationBar.OK);
             } else {
                 notificationBar.show('An error occurred while changing the name',notificationBar.ERROR);
