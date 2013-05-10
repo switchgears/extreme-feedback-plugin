@@ -65,6 +65,16 @@ public class XfManagementLink extends ManagementLink {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         return plugin.getLamps();
     }
+    @JavaScriptMethod
+    public Lamp getLamp(String macAddress) {
+        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        for (Lamp lamp : plugin.getLamps()) {
+            if (lamp.getMacAddress().equals(macAddress)) {
+                return lamp;
+            }
+        }
+        return null;
+    }
 
     @JavaScriptMethod
     public Collection<String> getProjects() {

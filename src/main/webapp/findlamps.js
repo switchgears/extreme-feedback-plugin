@@ -25,12 +25,26 @@ function drawLampsTable(lamps) {
         tr.appendChild(nameTd);
 
         var jobsTd = document.createElement('td');
-        jobsTd.innerHTML = jobs;
+        jobsTd.innerHTML = '<span id="lamp-name-' + mac + '-jobs">' + jobs + '</span>';
         tr.appendChild(jobsTd);
 
         lampsTable.appendChild(tr);
 
     }
+}
+
+function updateLampTable(project, mac){
+    var lampTD = document.getElementById("lamp-name-" + mac + "-jobs");
+    it.getLamp(mac, function(t) {
+        var lamp = t.responseObject();
+        var jobs = lamp.jobs.join(", ");
+        lampTD.innerHTML = '<span id="lamp-name-' + mac + '-jobs">' + jobs + '</span>';
+    });
+
+}
+function updateLampJobsView(project, mac){
+    saveLampJobAssociation(project, mac);
+    updateLampTable(project, mac);
 }
 
 function saveLampJobAssociation(project, macAddress) {
@@ -88,7 +102,7 @@ function drawLampsJobsTable(lamps) {
                 checkbox.type = "checkbox";
                 checkbox.checked = lamps[j].jobs.indexOf(projects[i]) > -1 ? true : false;
                 checkbox.id = "lamp-" + lamps[j].macAddress + "-" + projects[i];
-                checkbox.setAttribute("onclick", "saveLampJobAssociation('" + projects[i] + "', '" + lamps[j].macAddress + "')" );
+                checkbox.setAttribute("onclick", "updateLampJobsView('" + projects[i] + "', '" + lamps[j].macAddress + "')" );
                 cell.appendChild(checkbox);
                 tr.appendChild(cell);
             }
