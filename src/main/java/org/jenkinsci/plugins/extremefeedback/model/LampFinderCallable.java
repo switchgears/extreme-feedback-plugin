@@ -18,7 +18,7 @@ public class LampFinderCallable implements Callable<Set<Lamp>> {
 
     Set<Lamp> lamps = Sets.newTreeSet();
     private static final int PORT = 19418;
-    private static final byte[] MESSAGE = "EXTREMEFEEDBACK.COM".getBytes();
+    private static final byte[] MESSAGE = "GITGEAR.COM".getBytes();
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
     public Set<Lamp> call() throws Exception {

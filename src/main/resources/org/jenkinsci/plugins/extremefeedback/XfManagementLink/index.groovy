@@ -16,8 +16,8 @@ l.layout() {
         div {
             p {
                 text("Order your lamps at ")
-                a(href: "http://www.extremefeedback.com") {
-                    text("extremefeedback.com")
+                a(href: "http://www.gitgear.com/XFD") {
+                    text("gitgear.com/XFD")
                 }
             }
         }
