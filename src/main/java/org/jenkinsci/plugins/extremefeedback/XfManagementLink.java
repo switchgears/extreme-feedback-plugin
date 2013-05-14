@@ -6,6 +6,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.extremefeedback.model.Lamp;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
@@ -89,6 +90,11 @@ public class XfManagementLink extends ManagementLink {
                 lamp.addJob(projectName);
             }
         }
+        try {
+            plugin.save();
+        } catch (IOException e) {
+            LOGGER.severe("Could not save the Lamps plugin");
+        }
     }
 
     @JavaScriptMethod
@@ -98,6 +104,11 @@ public class XfManagementLink extends ManagementLink {
             if (lamp.getMacAddress().equals(macAddress)) {
                 lamp.removeJob(projectName);
             }
+        }
+        try {
+            plugin.save();
+        } catch (IOException e) {
+            LOGGER.severe("Could not save the Lamps plugin");
         }
     }
 

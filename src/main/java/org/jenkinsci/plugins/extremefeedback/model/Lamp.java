@@ -2,9 +2,13 @@ package org.jenkinsci.plugins.extremefeedback.model;
 
 import com.google.common.collect.Sets;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class Lamp implements Comparable<Lamp> {
+public class Lamp implements Comparable<Lamp>, Serializable {
+
+    private static final long serialVersionUID = 6746373847474387387L;
+
     private String ipAddress;
     private String macAddress;
     private String name;
