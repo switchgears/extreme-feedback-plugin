@@ -59,4 +59,22 @@ public class Lamps extends Plugin {
     public Set<Lamp> getLamps() {
         return lamps;
     }
+
+    public Set<String> getJobs() {
+        Set<String> jobs = Sets.newHashSet();
+        for (Lamp lamp : lamps) {
+            jobs.addAll(lamp.getJobs());
+        }
+        return jobs;
+    }
+
+    public Set<String> getIpsContainingJob(String jobName) {
+        Set<String> ipAddresses = Sets.newHashSet();
+        for (Lamp lamp : lamps) {
+            if (lamp.getJobs().contains(jobName)) {
+                ipAddresses.add(lamp.getIpAddress());
+            }
+        }
+        return ipAddresses;
+    }
 }
