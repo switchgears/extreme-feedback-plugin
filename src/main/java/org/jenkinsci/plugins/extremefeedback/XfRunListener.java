@@ -64,7 +64,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 }
             } else {
                 for (String ipAddress : ipAddresses) {
-                    sendNotification(ipAddress, resultColorMap.get(previousBuild.getResult()), Action.ON);
+                    sendNotification(ipAddress, resultColorMap.get(previousBuild.getResult()), Action.BLINK);
                 }
             }
         }
