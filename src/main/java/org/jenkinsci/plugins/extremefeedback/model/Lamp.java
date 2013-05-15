@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.extremefeedback.model;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
 import java.io.Serializable;
@@ -65,5 +66,24 @@ public class Lamp implements Comparable<Lamp>, Serializable {
 
     public void removeJob(String job) {
         this.jobs.remove(job);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.macAddress);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Lamp) {
+            Lamp that = (Lamp) object;
+            return Objects.equal(this.getMacAddress(), that.getMacAddress());
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("MAC", macAddress).toString();
     }
 }
