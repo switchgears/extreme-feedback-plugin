@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class XfRunListener extends RunListener<AbstractBuild> {
 
     private enum Color { GREEN, YELLOW, RED }
-    private enum Action { ON, OFF, BLINK }
+    private enum Action { SOLID, FLASHING }
 
     private final static Map<Result, Color> resultColorMap;
     static {
@@ -45,7 +45,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             Result result = run.getResult();
             Set<String> ipAddresses = plugin.getIpsContainingJob(run.getParent().getName());
             for (String ipAddress : ipAddresses) {
-                sendNotification(ipAddress, resultColorMap.get(result), Action.ON);
+                sendNotification(ipAddress, resultColorMap.get(result), Action.SOLID);
             }
         }
     }
@@ -60,11 +60,11 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             Run previousBuild = run.getPreviousBuild();
             if (previousBuild == null) {
                 for (String ipAddress : ipAddresses) {
-                    sendNotification(ipAddress, Color.GREEN, Action.ON);
+                    sendNotification(ipAddress, Color.GREEN, Action.SOLID);
                 }
             } else {
                 for (String ipAddress : ipAddresses) {
-                    sendNotification(ipAddress, resultColorMap.get(previousBuild.getResult()), Action.BLINK);
+                    sendNotification(ipAddress, resultColorMap.get(previousBuild.getResult()), Action.FLASHING);
                 }
             }
         }
