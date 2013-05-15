@@ -9,19 +9,19 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
-import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class LampFinderCallable implements Callable<Set<Lamp>> {
+public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
 
-    Set<Lamp> lamps = Sets.newTreeSet();
+    TreeSet<Lamp> lamps = Sets.newTreeSet();
     private static final int PORT = 19418;
     private static final byte[] MESSAGE = "GITGEAR.COM".getBytes();
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
-    public Set<Lamp> call() throws Exception {
+    public TreeSet<Lamp> call() throws Exception {
         // Send
         MulticastSocket mcs = new MulticastSocket(PORT+1);
         InetAddress inetAddress = InetAddress.getByName("239.77.124.213");
