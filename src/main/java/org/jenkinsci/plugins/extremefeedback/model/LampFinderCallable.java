@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.extremefeedback.model;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -26,6 +27,7 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
         MulticastSocket mcs = new MulticastSocket(PORT+1);
         InetAddress inetAddress = InetAddress.getByName("239.77.124.213");
         mcs.send(new DatagramPacket(MESSAGE, MESSAGE.length, inetAddress, PORT));
+
         // Receive
         mcs.joinGroup(inetAddress);
         mcs.setSoTimeout(5000);
@@ -37,13 +39,8 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
                 mcs.receive(receiver);
                 String data = new String(receiver.getData());
                 LOGGER.log(Level.INFO, data);
-                if(data.startsWith("MAC=")) {
-                    String macAddress = Iterables.getLast(
-                            Splitter.on("=").trimResults(
-                                    CharMatcher.noneOf(
-                                            CharMatcher.JAVA_LETTER_OR_DIGIT.toString()
-                                    )
-                            ).split(data));
+                if (data.startsWith("MAC=")) {
+                    String macAddress = extractMacAddress(data);
                     String ipAddress = receiver.getAddress().getHostAddress();
                     LOGGER.log(Level.INFO, "MAC Address: " + macAddress + " IP  Address: " + ipAddress);
                     Lamp lamp = new Lamp(macAddress, ipAddress);
@@ -55,6 +52,16 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
         }
         mcs.leaveGroup(inetAddress);
         return lamps;
+    }
+
+    @VisibleForTesting
+    public static String extractMacAddress(String data) {
+        Iterable<String> splitted = Splitter.on("=").trimResults(
+                CharMatcher.noneOf(
+                        CharMatcher.JAVA_LETTER_OR_DIGIT.toString()
+                )
+        ).split(data);
+        return Iterables.get(splitted, 1);
     }
 
 
