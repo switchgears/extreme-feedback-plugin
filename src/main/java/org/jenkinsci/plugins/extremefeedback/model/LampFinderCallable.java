@@ -1,9 +1,9 @@
 package org.jenkinsci.plugins.extremefeedback.model;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -38,8 +38,12 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
                 String data = new String(receiver.getData());
                 LOGGER.log(Level.INFO, data);
                 if(data.startsWith("MAC=")) {
-                    String macAddress = Iterables.getLast(Splitter.on("=").trimResults().split(data));
-                    macAddress = StringUtils.chomp(StringUtils.trim(macAddress));
+                    String macAddress = Iterables.getLast(
+                            Splitter.on("=").trimResults(
+                                    CharMatcher.noneOf(
+                                            CharMatcher.JAVA_LETTER_OR_DIGIT.toString()
+                                    )
+                            ).split(data));
                     String ipAddress = receiver.getAddress().getHostAddress();
                     LOGGER.log(Level.INFO, "MAC Address: " + macAddress + " IP  Address: " + ipAddress);
                     Lamp lamp = new Lamp(macAddress, ipAddress);
