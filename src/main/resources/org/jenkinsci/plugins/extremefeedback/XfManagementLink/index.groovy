@@ -57,6 +57,9 @@ l.layout() {
                 }
             }
         }
+
+        div {
+            button(onClick: "resetLamps();", "Reset Lamp List");
         }
 
         div {

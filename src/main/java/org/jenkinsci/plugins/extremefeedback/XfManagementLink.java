@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.extremefeedback;
 
+import com.google.common.collect.ImmutableSet;
 import hudson.Extension;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
@@ -9,6 +10,7 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +48,18 @@ public class XfManagementLink extends ManagementLink {
     }
 
     @JavaScriptMethod
+    public boolean resetLamps() {
+        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        plugin.setLamps(new TreeSet<Lamp>());
+        try {
+            plugin.save();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @JavaScriptMethod
     public Set<Lamp> addLampByIpAddress(String ipAddress) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
@@ -58,6 +72,7 @@ public class XfManagementLink extends ManagementLink {
         }
     }
 
+    @JavaScriptMethod
     public boolean changeLampName(String macAddress, String name) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         Set<Lamp> lamps = plugin.getLamps();
@@ -78,6 +93,7 @@ public class XfManagementLink extends ManagementLink {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         return plugin.getLamps();
     }
+
     @JavaScriptMethod
     public Lamp getLamp(String macAddress) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);

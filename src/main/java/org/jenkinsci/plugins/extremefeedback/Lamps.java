@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.*;
 import hudson.Plugin;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.extremefeedback.model.Lamp;
+import org.jenkinsci.plugins.extremefeedback.model.LampConfirmCallable;
 import org.jenkinsci.plugins.extremefeedback.model.LampFinderCallable;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
 
 public class Lamps extends Plugin {
 
-    Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
+    private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
     @Override
@@ -88,6 +89,10 @@ public class Lamps extends Plugin {
 
     public Set<Lamp> getLamps() {
         return lamps;
+    }
+
+    public void setLamps(Set<Lamp> lamps) {
+        this.lamps = lamps;
     }
 
     public Set<String> getJobs() {

@@ -187,6 +187,19 @@ function addLamp() {
     });
 }
 
+function resetLamps() {
+    it.resetLamps(function(t) {
+        var result = t.responseObject;
+        if (result) {
+            lamps = [];
+            drawLampsTable(lamps);
+            drawLampsJobsTable(lamps);
+        } else {
+            notificationBar.show('An error occurred resetting the lamps list', notificationBar.WARNING);
+        }
+    });
+}
+
 function init() {
     it.getLamps(function(t) {
         var lamps = t.responseObject();
