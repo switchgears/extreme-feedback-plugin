@@ -9,9 +9,8 @@ import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
 
-import java.io.IOException;
-import java.net.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -75,16 +74,9 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         gitgear.put("color", color);
         gitgear.put("action", action);
         byte[] data = gitgear.toString(2).getBytes();
-
-        try {
-            DatagramSocket socket = new DatagramSocket();
-            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(ipAddress), 39418);
-            socket.send(packet);
-        } catch (UnknownHostException e) {
-            LOGGER.severe(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.severe(e.getMessage());
-        }
+        int port = 39418;
+        UdpMessageSender.send(ipAddress, port, data);
     }
+
 
 }
