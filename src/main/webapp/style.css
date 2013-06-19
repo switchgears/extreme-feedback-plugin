@@ -1,0 +1,39 @@
+.sg-choice {
+    border: 1px #bbb solid;
+    border-collapse: collapse;
+    margin-top: 1em;
+    text-align: center;
+}
+
+.sg-choice td {
+    border: 1px #bbb solid;
+    padding: 0.5em;
+    width: 20em;
+}
+
+.sg-title {
+     background-color: #F0F0F0;
+     font-weight: bold;
+}
+
+.sg-subtitle {
+    background-color: #F9F9F9;
+    font-weight: bold;
+}
+
+.sg-table {
+    border: 1px #bbb solid;
+    border-collapse: collapse;
+    margin-top: 1em;
+}
+
+.sg-table th {
+    border: 1px #bbb solid;
+    padding: 0.5em;
+    background-color: #F0F0F0;
+}
+
+.sg-table td {
+    border: 1px #bbb solid;
+    padding: 0.5em;
+}

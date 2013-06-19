@@ -8,6 +8,7 @@ l.layout() {
     l.header() {
         st.bind(var: "it", value: my)
         script(src: "/plugin/extreme-feedback/findlamps.js")
+        link(rel: "stylesheet", type: "text/css", href:"/plugin/extreme-feedback/style.css")
     }
     l.main_panel() {
         h1 {
@@ -22,15 +23,44 @@ l.layout() {
             }
         }
 
-        div(id: "button") {
-            button(onClick:"findlamps();", "Find Lamps")
+        table(class:"sg-choice") {
+            tr(class: "sg-title") {
+                td(colspan:"2") {
+                    text("Add Lamps")
+                }
+            }
+            tr(class: "sg-subtitle") {
+                td {
+                    text("Automatically")
+                }
+                td {
+                    text("Manually")
+                }
+            }
+            tr {
+                td {
+                    div(id: "button") {
+                        button(onClick: "findlamps();", "Find lamps in the subnet")
+                    }
+                    div(id: "spinner", style: "display: none") {
+                        text("loading...")
+                    }
+                }
+                td {
+                    div(id: "add-lamp") {
+                        input(type: "text", id: "add-lamp-input", value: "IP Address")
+                        button(onClick: "addLamp();", "Add Lamp")
+                    }
+                    div(id: "spinner2", style: "display: none") {
+                        text("loading...")
+                    }
+                }
+            }
         }
-        div(id: "spinner", style: "display: none") {
-            text("loading...")
         }
 
         div {
-            table(class:"pane", style: "text-align: left") {
+            table(class:"sg-table", style: "text-align: left") {
                 thead {
                     tr {
                         th {
@@ -53,11 +83,9 @@ l.layout() {
         }
 
         div {
-            table(class: "pane", id: "lamp-job", style: "text-align: left") {
+            table(class: "sg-table", id: "lamp-job", style: "text-align: left") {
             }
         }
-
-
 
     }
 }
