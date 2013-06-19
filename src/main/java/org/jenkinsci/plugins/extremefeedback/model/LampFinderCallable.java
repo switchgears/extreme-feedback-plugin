@@ -57,9 +57,7 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
     @VisibleForTesting
     public static String extractMacAddress(String data) {
         Iterable<String> splitted = Splitter.on("=").trimResults(
-                CharMatcher.noneOf(
-                        CharMatcher.JAVA_LETTER_OR_DIGIT.toString()
-                )
+                CharMatcher.noneOf("0123456789abfcefABCDEF")
         ).split(data);
         return Iterables.get(splitted, 1);
     }
