@@ -162,6 +162,31 @@ function findlamps() {
     });
 }
 
+function addLamp() {
+    var button = document.getElementById("add-lamp");
+    var spinner = document.getElementById("spinner2");
+
+    button.style.display = "none";
+    spinner.style.display = "block";
+
+    var ipAddress = document.getElementById("add-lamp-input").value;
+
+    it.addLampByIpAddress(ipAddress, function(t) {
+        button.style.display = "block";
+        spinner.style.display = "none";
+
+        var lamps = t.responseObject();
+
+        if (lamps != null) {
+            drawLampsTable(lamps);
+            drawLampsJobsTable(lamps);
+        } else {
+            notificationBar.show('Lamp not found', notificationBar.WARNING)
+        }
+
+    });
+}
+
 function init() {
     it.getLamps(function(t) {
         var lamps = t.responseObject();

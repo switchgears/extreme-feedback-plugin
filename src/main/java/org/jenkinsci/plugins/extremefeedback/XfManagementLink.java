@@ -46,6 +46,18 @@ public class XfManagementLink extends ManagementLink {
     }
 
     @JavaScriptMethod
+    @JavaScriptMethod
+    public Set<Lamp> addLampByIpAddress(String ipAddress) {
+        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Set<Lamp> before = ImmutableSet.copyOf(plugin.getLamps());
+        Set<Lamp> after = ImmutableSet.copyOf(plugin.addLampByIp(ipAddress));
+        if (before != after) {
+            return after;
+        } else {
+            return null;
+        }
+    }
+
     public boolean changeLampName(String macAddress, String name) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         Set<Lamp> lamps = plugin.getLamps();

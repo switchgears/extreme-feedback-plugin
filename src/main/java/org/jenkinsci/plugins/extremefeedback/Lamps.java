@@ -107,4 +107,32 @@ public class Lamps extends Plugin {
         }
         return ipAddresses;
     }
+
+    public Set<Lamp> addLampByIp(final String ipAddress) {
+        ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+        ListenableFuture<String> listenableFuture = service.submit(new LampConfirmCallable(ipAddress));
+        Futures.addCallback(listenableFuture, new FutureCallback<String>() {
+            public void onSuccess(String macAddress) {
+                Lamp lamp = new Lamp(macAddress, ipAddress);
+                if (lamps.contains(lamp)) {
+                    lamps.remove(lamp);
+                }
+                lamps.add(lamp);
+            }
+
+            public void onFailure(Throwable throwable) {
+                LOGGER.severe(Throwables.getStackTraceAsString(throwable));
+            }
+        });
+
+        while(!listenableFuture.isDone()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                LOGGER.warning(e.getMessage());
+            }
+        }
+
+        return lamps;
+    }
 }
