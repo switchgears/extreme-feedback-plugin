@@ -14,6 +14,7 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     private String macAddress;
     private String name;
     private Set<String> jobs = Sets.newHashSet();
+    private boolean noisy;
 
     public Lamp(String macAddress, String ipAddress) {
         this.macAddress = macAddress;
@@ -42,6 +43,14 @@ public class Lamp implements Comparable<Lamp>, Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isNoisy() {
+        return noisy;
+    }
+
+    public void setNoisy(boolean noisy) {
+        this.noisy = noisy;
     }
 
     public Set<String> getJobs() {

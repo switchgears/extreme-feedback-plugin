@@ -9,6 +9,7 @@ import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.extremefeedback.model.Lamp;
 import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
 
 import java.util.Collections;
@@ -42,9 +43,17 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
         if (jobs.contains(run.getParent().getName())) {
             Result result = run.getResult();
-            Set<String> ipAddresses = plugin.getIpsContainingJob(run.getParent().getName());
-            for (String ipAddress : ipAddresses) {
-                sendNotification(ipAddress, resultColorMap.get(result), Action.SOLID);
+            Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
+            for (Lamp lamp : activeLamps) {
+                sendColorNotification(lamp.getIpAddress(), resultColorMap.get(result), Action.SOLID);
+                if (resultColorMap.get(result).equals(Color.RED) && lamp.isNoisy()) {
+                    try {
+                        Thread.sleep(1000);
+                        sendAlarmNotification(lamp.getIpAddress());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
@@ -55,21 +64,21 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         Set<String> jobs = plugin.getJobs();
 
         if (jobs.contains(run.getParent().getName())) {
-            Set<String> ipAddresses = plugin.getIpsContainingJob(run.getParent().getName());
+            Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
             Run previousBuild = run.getPreviousBuild();
             if (previousBuild == null) {
-                for (String ipAddress : ipAddresses) {
-                    sendNotification(ipAddress, Color.GREEN, Action.SOLID);
+                for (Lamp lamp : activeLamps) {
+                    sendColorNotification(lamp.getIpAddress(), Color.GREEN, Action.SOLID);
                 }
             } else {
-                for (String ipAddress : ipAddresses) {
-                    sendNotification(ipAddress, resultColorMap.get(previousBuild.getResult()), Action.FLASHING);
+                for (Lamp lamp : activeLamps) {
+                    sendColorNotification(lamp.getIpAddress(), resultColorMap.get(previousBuild.getResult()), Action.FLASHING);
                 }
             }
         }
     }
 
-    private void sendNotification(String ipAddress, Color color, Action action) {
+    private void sendColorNotification(String ipAddress, Color color, Action action) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("color", color);
         gitgear.put("action", action);
@@ -78,5 +87,13 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         UdpMessageSender.send(ipAddress, port, data);
     }
 
+    private void sendAlarmNotification(String ipAddress) {
+        JSONObject gitgear = new JSONObject();
+        gitgear.put("siren", "NA");
+        gitgear.put("action", "ON");
+        byte[] data = gitgear.toString(2).getBytes();
+        int port = 39418;
+        UdpMessageSender.send(ipAddress, port, data);
+    }
 
 }

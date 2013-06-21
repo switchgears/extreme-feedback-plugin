@@ -11,6 +11,12 @@ function drawLampsTable(lamps) {
         var ip = lamp.ipAddress;
         var name = lamp.name;
         var jobs = lamp.jobs.join(", ");
+        var alarm;
+        if (lamp.noisy) {
+            alarm = "checked";
+        } else {
+            alarm = "";
+        }
 
         var macTd = document.createElement('td');
         macTd.innerHTML = mac;
@@ -28,8 +34,11 @@ function drawLampsTable(lamps) {
         jobsTd.innerHTML = '<span id="lamp-name-' + mac + '-jobs">' + jobs + '</span>';
         tr.appendChild(jobsTd);
 
-        lampsTable.appendChild(tr);
+        var alarmTd = document.createElement('td');
+        alarmTd.innerHTML = '<input id="lamp-name-' + mac + '-alarm" type="checkbox" ' + alarm + ' onclick="changeLampAlarm(\'' + mac + '\', this)" >'
+        tr.appendChild(alarmTd);
 
+        lampsTable.appendChild(tr);
     }
 }
 
@@ -41,6 +50,12 @@ function updateLampTable(project, mac){
         lampTD.innerHTML = '<span id="lamp-name-' + mac + '-jobs">' + jobs + '</span>';
     });
 
+}
+
+function changeLampAlarm(mac, checkbox) {
+    it.setLampAlarm(mac, checkbox.checked, function(t) {
+        notificationBar.show('Lamp alarm set successfully', notificationBar.OK);
+    });
 }
 
 function updateJobTableHeader(mac, name){

@@ -61,6 +61,24 @@ public class XfManagementLink extends ManagementLink {
     }
 
     @JavaScriptMethod
+    public boolean setLampAlarm(String macAddress, boolean status) {
+        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        for (Lamp lamp : plugin.getLamps()) {
+            if (lamp.getMacAddress().equals(macAddress)) {
+                lamp.setNoisy(status);
+                try {
+                    plugin.save();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @JavaScriptMethod
     public Set<Lamp> addLampByIpAddress(String ipAddress) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         Set<Lamp> before = ImmutableSet.copyOf(plugin.getLamps());

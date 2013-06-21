@@ -103,14 +103,14 @@ public class Lamps extends Plugin {
         return jobs;
     }
 
-    public Set<String> getIpsContainingJob(String jobName) {
-        Set<String> ipAddresses = Sets.newHashSet();
+    public Set<Lamp> getLampsContainingJob(String jobName) {
+        Set<Lamp> activeLamps = Sets.newHashSet();
         for (Lamp lamp : lamps) {
             if (lamp.getJobs().contains(jobName)) {
-                ipAddresses.add(lamp.getIpAddress());
+                activeLamps.add(lamp);
             }
         }
-        return ipAddresses;
+        return activeLamps;
     }
 
     public Set<Lamp> addLampByIp(final String ipAddress) {

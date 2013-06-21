@@ -67,16 +67,19 @@ l.layout() {
                 thead {
                     tr {
                         th {
-                            text("MAC Address");
+                            text("MAC Address")
                         }
                         th {
-                            text("IP Address");
+                            text("IP Address")
                         }
                         th {
-                            text("Name");
+                            text("Name")
                         }
                         th {
                             text("Job(s) Assigned To")
+                        }
+                        th {
+                            text("Alarm")
                         }
                     }
                 }
