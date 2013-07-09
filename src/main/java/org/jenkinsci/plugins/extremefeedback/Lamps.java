@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.*;
 import hudson.Plugin;
 import jenkins.model.Jenkins;
@@ -23,6 +24,7 @@ public class Lamps extends Plugin {
 
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    private EventBus eventBus = new EventBus("extreme-feedback");
 
     @Override
     public void start() throws Exception {
@@ -139,5 +141,9 @@ public class Lamps extends Plugin {
         }
 
         return lamps;
+    }
+
+    public EventBus getEventBus() {
+        return eventBus;
     }
 }

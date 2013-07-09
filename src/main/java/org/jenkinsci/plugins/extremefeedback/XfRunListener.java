@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.extremefeedback;
 
-import com.google.common.collect.Maps;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
@@ -9,30 +8,16 @@ import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.extremefeedback.model.JenkinsEvent;
 import org.jenkinsci.plugins.extremefeedback.model.Lamp;
+import org.jenkinsci.plugins.extremefeedback.model.States;
 import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 @Extension
 public class XfRunListener extends RunListener<AbstractBuild> {
-
-    private enum Color { GREEN, YELLOW, RED }
-    private enum Action { SOLID, FLASHING }
-
-    private final static Map<Result, Color> resultColorMap;
-    static {
-        Map<Result, Color> map = Maps.newHashMap();
-        map.put(Result.ABORTED, Color.RED);
-        map.put(Result.FAILURE, Color.RED);
-        map.put(Result.NOT_BUILT, Color.RED);
-        map.put(Result.UNSTABLE, Color.YELLOW);
-        map.put(Result.SUCCESS, Color.GREEN);
-        resultColorMap = Collections.unmodifiableMap(map);
-    }
 
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
@@ -45,10 +30,16 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             Result result = run.getResult();
             Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
             for (Lamp lamp : activeLamps) {
-                sendColorNotification(lamp.getIpAddress(), resultColorMap.get(result), Action.SOLID);
-                if (resultColorMap.get(result).equals(Color.RED) && lamp.isNoisy()) {
+                String jsonColor = buildColorJson(States.resultColorMap.get(result).toString(), lamp, false);
+                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+
+                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
+                if (States.resultColorMap.get(result).equals(States.Color.RED) && lamp.isNoisy()) {
                     try {
                         Thread.sleep(1000);
+                        String jsonBuzzer = buildBuzzerJson(lamp);
+                        plugin.getEventBus().post(new JenkinsEvent(jsonBuzzer));
+
                         sendAlarmNotification(lamp.getIpAddress());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -68,17 +59,39 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             Run previousBuild = run.getPreviousBuild();
             if (previousBuild == null) {
                 for (Lamp lamp : activeLamps) {
-                    sendColorNotification(lamp.getIpAddress(), Color.GREEN, Action.SOLID);
+                    String jsonColor = buildColorJson(States.Color.GREEN.toString(), lamp, false);
+                    plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+
+                    sendColorNotification(lamp.getIpAddress(), States.Color.GREEN, States.Action.SOLID);
                 }
             } else {
                 for (Lamp lamp : activeLamps) {
-                    sendColorNotification(lamp.getIpAddress(), resultColorMap.get(previousBuild.getResult()), Action.FLASHING);
+                    String jsonColor = buildColorJson(States.resultColorMap.get(previousBuild.getResult()).toString(), lamp, true);
+                    plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+
+                    sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(previousBuild.getResult()), States.Action.FLASHING);
                 }
             }
         }
     }
 
-    private void sendColorNotification(String ipAddress, Color color, Action action) {
+    private String buildBuzzerJson(Lamp lamp) {
+        JSONObject jsonBuzzer = new JSONObject();
+        jsonBuzzer.accumulate("macAddress", lamp.getMacAddress());
+        jsonBuzzer.accumulate("type", "buzzer");
+        return jsonBuzzer.toString() + ",";
+    }
+
+    private String buildColorJson(String color, Lamp lamp, boolean flashing) {
+        JSONObject jsonColor = new JSONObject();
+        jsonColor.accumulate("macAddress", lamp.getMacAddress());
+        jsonColor.accumulate("type", "color");
+        jsonColor.accumulate("color", color);
+        jsonColor.accumulate("flashing", flashing);
+        return jsonColor.toString() + ",";
+    }
+
+    private void sendColorNotification(String ipAddress, States.Color color, States.Action action) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("color", color);
         gitgear.put("action", action);
