@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.extremefeedback.model;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -19,6 +20,15 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     public Lamp(String macAddress, String ipAddress) {
         this.macAddress = macAddress;
         this.ipAddress = ipAddress;
+    }
+
+    @DataBoundConstructor
+    public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy) {
+        this.ipAddress = ipAddress;
+        this.macAddress = macAddress;
+        this.name = name;
+        this.jobs = Sets.newHashSet(jobs);
+        this.noisy = noisy;
     }
 
     public String getIpAddress() {
