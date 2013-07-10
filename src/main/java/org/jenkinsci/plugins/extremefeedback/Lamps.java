@@ -128,7 +128,7 @@ public class Lamps extends Plugin {
             }
 
             public void onFailure(Throwable throwable) {
-                LOGGER.severe(Throwables.getStackTraceAsString(throwable));
+                LOGGER.warning(throwable.getMessage());
             }
         });
 
