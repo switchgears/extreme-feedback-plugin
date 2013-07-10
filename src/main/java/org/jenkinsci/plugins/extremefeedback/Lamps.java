@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.extremefeedback;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.*;
@@ -14,6 +15,7 @@ import org.jenkinsci.plugins.extremefeedback.model.LampFinderCallable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -141,6 +143,14 @@ public class Lamps extends Plugin {
         }
 
         return lamps;
+    }
+
+    public Map<String, Lamp> getLampsAsMap() {
+        Map<String, Lamp> result = Maps.newHashMap();
+        for (Lamp lamp : lamps) {
+            result.put(lamp.getMacAddress(), lamp);
+        }
+        return result;
     }
 
     public EventBus getEventBus() {

@@ -36,4 +36,53 @@
 .sg-table td {
     border: 1px #bbb solid;
     padding: 0.5em;
+    vertical-align: middle;
+}
+
+table.jobs {
+    border-spacing: 0px;
+}
+
+table.jobs tr:hover {
+    background-color: #F9F9F9;
+    padding: 0;
+    border: 0;
+    height: 14px;
+}
+
+table.jobs td {
+    padding: 0;
+    border: 0;
+    height: 14px;
+}
+
+.suggest {
+    position: absolute;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCFF;
+    font-size: 90%;
+    width: 200px;
+}
+.suggest div {
+    display: block;
+    width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.suggest div.select{ /* keydown, keyup */
+    color: #FFFFFF;
+    background-color: #3366FF;
+}
+
+.suggest div.over{ /* mouse over */
+    background-color: #99CCFF;
+}
+
+.progress-bar {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-bar td {
+    padding: 0;
 }
