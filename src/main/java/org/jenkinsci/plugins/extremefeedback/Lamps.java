@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 public class Lamps extends Plugin {
 
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
-    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
-    private EventBus eventBus = new EventBus("extreme-feedback");
+    transient private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    transient private EventBus eventBus = new EventBus("extreme-feedback");
 
     @Override
     public void start() throws Exception {
