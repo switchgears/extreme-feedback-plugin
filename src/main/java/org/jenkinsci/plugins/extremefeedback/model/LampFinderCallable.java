@@ -17,26 +17,36 @@ import java.util.logging.Logger;
 
 public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
 
-    TreeSet<Lamp> lamps = Sets.newTreeSet();
     private static final int PORT = 19418;
     private static final byte[] MESSAGE = "GITGEAR.COM".getBytes();
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
     public TreeSet<Lamp> call() throws Exception {
+        TreeSet<Lamp> lamps = Sets.newTreeSet();
         // Send
-        MulticastSocket mcs = new MulticastSocket(PORT+1);
+        LOGGER.log(Level.INFO, "Broadcasting looking for lamps");
+
+        // Setup the sender
+        MulticastSocket mcsSender = new MulticastSocket(PORT);
         InetAddress inetAddress = InetAddress.getByName("239.77.124.213");
-        mcs.send(new DatagramPacket(MESSAGE, MESSAGE.length, inetAddress, PORT));
+        mcsSender.joinGroup(inetAddress);
+        mcsSender.setSoTimeout(2000);
+
+        // Setup the receiver
+        MulticastSocket mcsReceiver = new MulticastSocket(PORT+1);
+        mcsReceiver.joinGroup(inetAddress);
+        mcsReceiver.setSoTimeout(2000);
+        byte[] buf = new byte[1000];
+        DatagramPacket receiver = new DatagramPacket(buf, buf.length, inetAddress, PORT+1);
+
+        // Send
+        mcsSender.send(new DatagramPacket(MESSAGE, MESSAGE.length, inetAddress, PORT));
 
         // Receive
-        mcs.joinGroup(inetAddress);
-        mcs.setSoTimeout(5000);
         boolean exit = false;
         while(!exit) {
-            byte[] buf = new byte[1000];
-            DatagramPacket receiver = new DatagramPacket(buf, buf.length);
             try {
-                mcs.receive(receiver);
+                mcsReceiver.receive(receiver);
                 String data = new String(receiver.getData());
                 LOGGER.log(Level.INFO, data);
                 if (data.startsWith("MAC=")) {
@@ -48,9 +58,13 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
                 }
             } catch (SocketTimeoutException e) {
                 exit = true;
+                LOGGER.log(Level.INFO, "Time is out!");
             }
         }
-        mcs.leaveGroup(inetAddress);
+        mcsSender.leaveGroup(inetAddress);
+        mcsSender.close();
+        mcsReceiver.leaveGroup(inetAddress);
+        mcsReceiver.close();
         return lamps;
     }
 
