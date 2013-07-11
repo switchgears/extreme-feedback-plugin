@@ -16,6 +16,7 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     private String name;
     private Set<String> jobs = Sets.newHashSet();
     private boolean noisy;
+    private boolean inactive;
 
     public Lamp(String macAddress, String ipAddress) {
         this.macAddress = macAddress;
@@ -23,12 +24,13 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     }
 
     @DataBoundConstructor
-    public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy) {
+    public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy, boolean inactive) {
         this.ipAddress = ipAddress;
         this.macAddress = macAddress;
         this.name = name;
         this.jobs = Sets.newHashSet(jobs);
         this.noisy = noisy;
+        this.inactive = inactive;
     }
 
     public String getIpAddress() {
@@ -61,6 +63,14 @@ public class Lamp implements Comparable<Lamp>, Serializable {
 
     public void setNoisy(boolean noisy) {
         this.noisy = noisy;
+    }
+
+    public boolean isInactive() {
+        return inactive;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
     }
 
     public Set<String> getJobs() {

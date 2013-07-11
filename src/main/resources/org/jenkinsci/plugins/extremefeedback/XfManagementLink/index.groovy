@@ -73,6 +73,9 @@ l.layout() {
                     thead {
                         tr {
                             th {
+                                text("Active")
+                            }
+                            th {
                                 text("MAC Address")
                             }
                             th {
@@ -94,6 +97,9 @@ l.layout() {
                     }
                     tbody {
                         tr("ng-repeat": "lamp in lamps") {
+                            td {
+                                input(type: "checkbox", "ng-model": "lamp.inactive", "ng-change": "changeLamp(lamp)", "inverted": "")
+                            }
                             td {
                                 text("{{lamp.macAddress}}")
                             }

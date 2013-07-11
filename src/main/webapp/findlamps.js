@@ -14,6 +14,16 @@ xfModule.directive('ngEnter', function() {
     };
 });
 
+xfModule.directive('inverted', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            ngModel.$parsers.push(function(val) { return !val; });
+            ngModel.$formatters.push(function(val) { return !val; });
+        }
+    };
+});
+
 xfModule.controller('xfController', [ '$scope', function($scope) {
     $scope.lamps = [];
 

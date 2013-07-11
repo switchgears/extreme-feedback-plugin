@@ -43,16 +43,31 @@ public class Lamps extends Plugin {
                 } else {
                     ImmutableSet<Lamp> lampsCopy;
 
+                    // Activate lamps
+                    Map<String, Lamp> currentLamps = getLampsAsMap();
+                    for (Lamp foundLamp : foundLamps) {
+                        if (currentLamps.containsKey(foundLamp.getMacAddress())) {
+                            Lamp lamp = currentLamps.get(foundLamp.getMacAddress());
+                            lamp.setInactive(false);
+                        }
+                    }
+                    lamps = Sets.newTreeSet(currentLamps.values());
+
                     // Add new lamps
                     lampsCopy = ImmutableSet.copyOf(lamps);
                     Set<Lamp> newLamps = Sets.difference(foundLamps, lampsCopy);
                     lamps.addAll(newLamps);
                     LOGGER.info("Lamps added: " + Joiner.on(", ").join(newLamps));
 
-                    // Remove old lamps
+                    // Deactivate old lamps
                     lampsCopy = ImmutableSet.copyOf(lamps);
                     Set<Lamp> obsoleteLamps = Sets.difference(lampsCopy, foundLamps);
-                    lamps.removeAll(obsoleteLamps);
+                    Map<String, Lamp> lampsAsMap = getLampsAsMap();
+                    for (Lamp obsoleteLamp : obsoleteLamps) {
+                        Lamp lamp = lampsAsMap.get(obsoleteLamp.getMacAddress());
+                        lamp.setInactive(true);
+                    }
+                    lamps = Sets.newTreeSet(lampsAsMap.values());
                     LOGGER.info("Lamps removed: " + Joiner.on(", ").join(obsoleteLamps));
 
                     // Update other lamps
