@@ -127,7 +127,7 @@ l.layout() {
                                 input(type: "checkbox", "ng-model": "lamp.noisy", "ng-change": "changeLamp(lamp)")
                             }
                             td {
-                                img(src: "/plugin/extreme-feedback/remove.png", "ng-click": "removeLamp(lamp)")
+                                img(src: "/plugin/extreme-feedback/remove.png", "ng-click": "removeLamp(lamp)", style: "cursor: pointer;")
                             }
                         }
                     }
