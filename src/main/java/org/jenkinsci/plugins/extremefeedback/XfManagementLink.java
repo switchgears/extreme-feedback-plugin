@@ -47,20 +47,6 @@ public class XfManagementLink extends ManagementLink {
     }
 
     @JavaScriptMethod
-    public boolean resetLamps() {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
-        plugin.setLamps(new TreeSet<Lamp>());
-        try {
-            plugin.save();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-
-    @JavaScriptMethod
     public boolean updateLamp(Lamp lamp) {
         Lamps plugin = jenkins.getPlugin(Lamps.class);
         Map<String,Lamp> lamps = plugin.getLampsAsMap();
