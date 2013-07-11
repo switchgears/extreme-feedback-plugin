@@ -163,4 +163,18 @@ public class XfManagementLink extends ManagementLink {
         return plugin.getLamps();
     }
 
+    @JavaScriptMethod
+    public Collection<Lamp> removeLamp(String macAddress) {
+        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Map<String, Lamp> lamps = plugin.getLampsAsMap();
+        lamps.remove(macAddress);
+        plugin.setLamps(Sets.newHashSet(lamps.values()));
+        try {
+            plugin.save();
+        } catch (IOException e) {
+            LOGGER.severe("Could not save the Lamps plugin");
+        }
+        return plugin.getLamps();
+    }
+
 }

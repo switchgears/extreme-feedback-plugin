@@ -87,6 +87,9 @@ l.layout() {
                             th {
                                 text("Alarm")
                             }
+                            th {
+                                text("Remove")
+                            }
                         }
                     }
                     tbody {
@@ -122,6 +125,9 @@ l.layout() {
                             }
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.noisy", "ng-change": "changeLamp(lamp)")
+                            }
+                            td {
+                                img(src: "/plugin/extreme-feedback/remove.png", "ng-click": "removeLamp(lamp)")
                             }
                         }
                     }

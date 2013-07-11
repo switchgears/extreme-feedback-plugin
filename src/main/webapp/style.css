@@ -37,6 +37,11 @@
     border: 1px #bbb solid;
     padding: 0.5em;
     vertical-align: middle;
+    text-align: center;
+}
+
+.sg-table td td {
+    text-align: left;
 }
 
 table.jobs {

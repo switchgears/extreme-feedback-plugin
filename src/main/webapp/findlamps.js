@@ -88,7 +88,7 @@ xfModule.controller('xfController', [ '$scope', function($scope) {
         it.findLamps(function(t) {
             var l = t.responseObject();
             if (!l.length) {
-                notificationBar.show('No lamps have been found',notificationBar.WARNING)
+                notificationBar.show('No lamps have been found',notificationBar.WARNING);
             }
             $scope.lamps = l;
             $scope.findlampsToggle = true;
@@ -105,10 +105,26 @@ xfModule.controller('xfController', [ '$scope', function($scope) {
             if (l != null) {
                 $scope.lamps = l;
             } else {
-                notificationBar.show('Lamp not found', notificationBar.WARNING)
+                notificationBar.show('Lamp not found', notificationBar.WARNING);
             }
             $scope.ipToggle = true;
             $scope.$apply();
         });
     };
+
+    $scope.removeLamp = function(lamp) {
+        var result = confirm("Are you sure you want to remove this lamp?")
+        if (result) {
+            it.removeLamp(lamp.macAddress, function(t) {
+                var l = t.responseObject();
+                if (angular.equals(l, $scope.lamps)) {
+                    notificationBar.show('Cannot remove the lamp', notificationBar.WARNING);
+                } else {
+                    notificationBar.show('Lamp removed', notificationBar.OK);
+                    $scope.lamps = l;
+                    $scope.$apply();
+                }
+            });
+        }
+    }
 }]);
