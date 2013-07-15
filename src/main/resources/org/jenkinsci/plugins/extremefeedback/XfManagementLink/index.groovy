@@ -10,7 +10,6 @@ def st=namespace("jelly:stapler")
 l.layout() {
     l.header() {
         st.bind(var: "it", value: my)
-        script(src: "/plugin/extreme-feedback/suggest.js")
         script(src: "/plugin/extreme-feedback/angular.min.js")
         script(src: "/plugin/extreme-feedback/findlamps.js")
         link(rel: "stylesheet", type: "text/css", href:"/plugin/extreme-feedback/style.css")
@@ -116,15 +115,13 @@ l.layout() {
                                         td {
                                             text("{{job}}")
                                         }
-                                        td(align: "right") {
+                                        td(align: "right", class: "delete") {
                                             img(src: "/plugin/extreme-feedback/remove.png", "ng-click": "removeProjectFromLamp(job, lamp)", style: "display:none;", "ng-show": "showRemove")
                                         }
                                     }
                                     tr {
                                         td(colspan: "2") {
-                                            input(id: "job-{{lamps.indexOf(lamp)}}", type: "text", "ng-click": "suggestProjects(lamps.indexOf(lamp))", "ng-model": "jobName", "ng-enter": "addProjectToLamp(jobName, lamp)")
-                                            button("ng-click": "addProjectToLamp(jobName, lamp)", "Add")
-                                            div(id: "suggest-{{lamps.indexOf(lamp)}}", style: "display:none;", class: "suggest")
+                                            typeahead("items": "projects", "btntxt": "Add", "context": "lamp", "action": "addProjectToLamp(arg1, arg2)")
                                         }
                                     }
                                 }

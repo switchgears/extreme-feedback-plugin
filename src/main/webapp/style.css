@@ -61,31 +61,23 @@ table.jobs td {
     height: 14px;
 }
 
-.suggest {
-    position: absolute;
-    background-color: #FFFFFF;
-    border: 1px solid #CCCCFF;
-    font-size: 90%;
-    width: 200px;
+table.jobs td.delete {
+    text-align: right;
 }
-.suggest div {
+
+ul.typeahead {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #eee;
     display: block;
-    width: 200px;
-    overflow: hidden;
-    white-space: nowrap;
-}
-.suggest div.select{ /* keydown, keyup */
-    color: #FFFFFF;
-    background-color: #3366FF;
 }
 
-.suggest div.over{ /* mouse over */
-    background-color: #99CCFF;
+ul.typeahead li {
+    display: block;
 }
 
-.progress-bar {
-    margin-left: auto;
-    margin-right: auto;
+ul.typeahead li.selected {
+    background-color: #ccc;
 }
 
 .progress-bar td {

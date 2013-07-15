@@ -1,4 +1,4 @@
-var xfModule = angular.module('xfApp', [])
+var xfModule = angular.module('xfApp', []);
 
 xfModule.directive('ngEnter', function() {
     return function(scope, element, attrs) {
@@ -22,6 +22,105 @@ xfModule.directive('inverted', function() {
             ngModel.$formatters.push(function(val) { return !val; });
         }
     };
+});
+
+xfModule.directive('ngBlur', function() {
+    return function( scope, elem, attrs ) {
+        elem.bind('blur', function() {
+            scope.$apply(attrs.ngBlur);
+        });
+    };
+});
+
+xfModule.directive('typeahead', function () {
+    return {
+        restrict: "E",
+        replace: true,
+        scope: {
+            items: "=",
+            btntxt: "@",
+            action: "&",
+            context: "="
+        },
+        template: '<div><input type="text" ng-model="query" ng-blur="blur"><button ng-click="action({arg1: query, arg2: context})">{{btntxt}}</button><ul class="typeahead" ng-show="query.length && showList"><li ng-repeat="item in items | filter:query" ng-class="{selected: $index==selectedIndex}" index="{{$index}}">{{item}}</li></ul></div>',
+        controller: ["$scope", function($scope) {
+            $scope.query = "";
+            $scope.selectedIndex = 0;
+            $scope.currentLength = 0;
+            $scope.showList = false;
+            $scope.blur = false;
+
+            $scope.selectNextItem = function() {
+                $scope.selectedIndex = ($scope.selectedIndex + 1) % $scope.currentLength;
+                $scope.$apply();
+            };
+
+            $scope.selectPreviousItem = function() {
+                $scope.selectedIndex = ($scope.selectedIndex + $scope.currentLength - 1) % $scope.currentLength;
+                $scope.$apply();
+            };
+
+            $scope.resetIndex = function() {
+                $scope.selectedIndex = 0;
+            };
+        }],
+        link: function(scope, element, attrs, controller) {
+            var $input = element.find('input');
+            var $ul = element.find('ul');
+
+            $ul.bind('mouseover', function(e) {
+                console.log(e);
+                var $element = e.target;
+                var $i = $element.getAttribute("index");
+                scope.$apply(function() {
+                    scope.selectedIndex = $i;
+                });
+            });
+
+            $input.bind('focus', function() {
+                scope.$apply(function() {
+                    scope.resetIndex();
+                    scope.showList = true;
+                });
+            });
+
+            $input.bind('blur', function() {
+                scope.$apply(function() {
+                    scope.showList = false;
+                    if ($input[0].value.length) {
+                        scope.query = $ul.children()[parseInt(scope.selectedIndex)].innerHTML;
+                    }
+                    scope.resetIndex();
+                });
+            });
+
+            $input.bind('keydown', function(e) {
+                var $list = element.find('ul');
+                scope.$apply(function() {
+                    scope.currentLength = $list.children().length;
+                });
+
+                if (e.keyCode === 40) {
+                    e.preventDefault();
+                    scope.selectNextItem();
+                }
+
+                if (e.keyCode === 38) {
+                    e.preventDefault();
+                    scope.selectPreviousItem();
+                }
+
+                if (e.keyCode === 13) {
+                    e.preventDefault();
+                    var $query = $list.children()[parseInt(scope.selectedIndex)].innerHTML;
+                    scope.$apply(function() {
+                        scope.query = $query;
+                        scope.showList = false;
+                    });
+                }
+            });
+        }
+    }
 });
 
 xfModule.controller('xfController', [ '$scope', function($scope) {
@@ -123,7 +222,7 @@ xfModule.controller('xfController', [ '$scope', function($scope) {
     };
 
     $scope.removeLamp = function(lamp) {
-        var result = confirm("Are you sure you want to remove this lamp?")
+        var result = confirm("Are you sure you want to remove this lamp?");
         if (result) {
             it.removeLamp(lamp.macAddress, function(t) {
                 var l = t.responseObject();
@@ -136,5 +235,9 @@ xfModule.controller('xfController', [ '$scope', function($scope) {
                 }
             });
         }
-    }
+    };
+
+    $scope.write = function(text) {
+        console.log(text);
+    };
 }]);
