@@ -96,6 +96,7 @@ l.layout() {
                     }
                     tbody {
                         tr("ng-repeat": "lamp in lamps") {
+                        tr("ng-repeat": "lamp in lamps | orderBy:['macAddress']") {
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.inactive", "ng-change": "changeLamp(lamp)", "inverted": "")
                             }
