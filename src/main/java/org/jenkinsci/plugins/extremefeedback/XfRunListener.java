@@ -34,6 +34,19 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
+
+                if (lamp.isSfx()) {
+                    try {
+                        Thread.sleep(1000);
+                        String jsonSfx = buildSfxJson(States.resultColorMap.get(result).toString(), lamp);
+                        plugin.getEventBus().post(new JenkinsEvent(jsonSfx));
+
+                        sendSfxNotification(lamp.getIpAddress(), States.resultColorMap.get(result));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (States.resultColorMap.get(result).equals(States.Color.RED) && lamp.isNoisy()) {
                     try {
                         Thread.sleep(1000);
@@ -91,6 +104,14 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         return jsonColor.toString() + ",";
     }
 
+    private String buildSfxJson(String color, Lamp lamp) {
+        JSONObject jsonSfx = new JSONObject();
+        jsonSfx.accumulate("macAddress", lamp.getMacAddress());
+        jsonSfx.accumulate("type", "soundalarm");
+        jsonSfx.accumulate("color", color);
+        return jsonSfx.toString() + ",";
+    }
+
     private void sendColorNotification(String ipAddress, States.Color color, States.Action action) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("color", color);
@@ -104,6 +125,15 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         JSONObject gitgear = new JSONObject();
         gitgear.put("siren", "NA");
         gitgear.put("action", "ON");
+        byte[] data = gitgear.toString(2).getBytes();
+        int port = 39418;
+        UdpMessageSender.send(ipAddress, port, data);
+    }
+
+    private void sendSfxNotification(String ipAddress, States.Color color) {
+        JSONObject gitgear = new JSONObject();
+        gitgear.put("soundeffect", "NA");
+        gitgear.put("color", color);
         byte[] data = gitgear.toString(2).getBytes();
         int port = 39418;
         UdpMessageSender.send(ipAddress, port, data);

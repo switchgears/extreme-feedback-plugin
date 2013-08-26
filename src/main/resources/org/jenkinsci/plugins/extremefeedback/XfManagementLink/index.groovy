@@ -90,12 +90,14 @@ l.layout() {
                                 text("Alarm")
                             }
                             th {
+                                text("SFX")
+                            }
+                            th {
                                 text("Remove")
                             }
                         }
                     }
                     tbody {
-                        tr("ng-repeat": "lamp in lamps") {
                         tr("ng-repeat": "lamp in lamps | orderBy:['macAddress']") {
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.inactive", "ng-change": "changeLamp(lamp)", "inverted": "")
@@ -129,6 +131,9 @@ l.layout() {
                             }
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.noisy", "ng-change": "changeLamp(lamp)")
+                            }
+                            td {
+                                input(type: "checkbox", "ng-model": "lamp.sfx", "ng-change": "changeLamp(lamp)")
                             }
                             td {
                                 img(src: "/plugin/extreme-feedback/remove.png", "ng-click": "removeLamp(lamp)", style: "cursor: pointer;")

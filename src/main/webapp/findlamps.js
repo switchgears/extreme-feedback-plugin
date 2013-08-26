@@ -193,7 +193,6 @@ xfModule.controller('xfController', [ '$scope', function($scope) {
 
     $scope.findlamps = function() {
         $scope.findlampsToggle = false;
-        $scope.$apply();
         it.findLamps(function(t) {
             var l = t.responseObject();
             if (!l.length) {
