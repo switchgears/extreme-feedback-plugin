@@ -7,12 +7,12 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.extremefeedback.model.JenkinsEvent;
 
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Extension
 public class EventStreamCommand extends CLICommand {
 
-    private Queue<String> events = new LinkedBlockingDeque<String>();
+    private Queue<String> events = new LinkedBlockingQueue<String>();
 
     public EventStreamCommand() {
         super();
