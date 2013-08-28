@@ -32,7 +32,7 @@ public class XfManagementLink extends ManagementLink {
 
     @Override
     public String getDescription() {
-        return "Manage the <a href=\"http://www.gitgear.com/XFD\">gitgear.com</a> Extreme Feedback Lamps.";
+        return "Manage the <a href=\"http://www.gitgear.com/xfd\">gitgear.com</a> Extreme Feedback Lamps.";
     }
 
     @Override
