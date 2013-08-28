@@ -25,8 +25,8 @@ l.layout() {
                 div {
                     p {
                         text("Order your lamps at ")
-                        a(href: "http://www.gitgear.com/XFD") {
-                            text("gitgear.com/XFD")
+                        a(href: "http://www.gitgear.com/xfd") {
+                            text("gitgear.com/xfd")
                         }
                     }
                 }
