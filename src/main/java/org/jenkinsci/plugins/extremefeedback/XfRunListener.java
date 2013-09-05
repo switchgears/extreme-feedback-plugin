@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.extremefeedback.model.Lamp;
 import org.jenkinsci.plugins.extremefeedback.model.States;
 import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
 
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -25,15 +26,18 @@ public class XfRunListener extends RunListener<AbstractBuild> {
     public void onCompleted(AbstractBuild run, TaskListener listener) {
         Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
         Set<String> jobs = plugin.getJobs();
+        String jobName = run.getParent().getName();
 
-        if (jobs.contains(run.getParent().getName())) {
+        if (jobs.contains(jobName)) {
             Result result = run.getResult();
-            Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
+            Set<Lamp> activeLamps = plugin.getLampsContainingJob(jobName);
             for (Lamp lamp : activeLamps) {
                 String jsonColor = buildColorJson(States.resultColorMap.get(result).toString(), lamp, false);
                 plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
+
+                sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), result.toString());
 
                 if (lamp.isSfx()) {
                     try {
@@ -66,9 +70,10 @@ public class XfRunListener extends RunListener<AbstractBuild> {
     public void onStarted(AbstractBuild run, TaskListener listener) {
         Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
         Set<String> jobs = plugin.getJobs();
+        String jobName = run.getParent().getName();
 
-        if (jobs.contains(run.getParent().getName())) {
-            Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
+        if (jobs.contains(jobName)) {
+            Set<Lamp> activeLamps = plugin.getLampsContainingJob(jobName);
             Run previousBuild = run.getPreviousBuild();
             if (previousBuild == null) {
                 for (Lamp lamp : activeLamps) {
@@ -76,6 +81,8 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                     sendColorNotification(lamp.getIpAddress(), States.Color.GREEN, States.Action.SOLID);
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), "Started");
+
                 }
             } else {
                 for (Lamp lamp : activeLamps) {
@@ -83,6 +90,8 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                     sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(previousBuild.getResult()), States.Action.FLASHING);
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), "Started");
+
                 }
             }
         }
@@ -138,5 +147,17 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         int port = 39418;
         UdpMessageSender.send(ipAddress, port, data);
     }
+
+    private void sendLCDTextNotification(String ipAddress, String lineOne, String lineTwo) {
+        JSONObject displayText = new JSONObject();
+        LinkedHashMap lcdText = new LinkedHashMap();
+        lcdText.put("line_one", lineOne);
+        lcdText.put("line_two", lineTwo);
+        displayText.put("lcd_text", lcdText);
+        byte[] data = displayText.toString(2).getBytes();
+        int port = 39418;
+        UdpMessageSender.send(ipAddress, port, data);
+    }
+
 
 }
