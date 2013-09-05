@@ -4,16 +4,21 @@ import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.model.Run;
+import hudson.model.User;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
+import jenkins.model.CauseOfInterruption;
+import jenkins.model.InterruptedBuildAction;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
 import org.jenkinsci.plugins.extremefeedback.model.JenkinsEvent;
 import org.jenkinsci.plugins.extremefeedback.model.Lamp;
 import org.jenkinsci.plugins.extremefeedback.model.States;
 import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -22,6 +27,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
+   
     @Override
     public void onCompleted(AbstractBuild run, TaskListener listener) {
         Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
@@ -37,7 +43,25 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
 
-                sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), result.toString());
+                
+                
+                if (Result.FAILURE.equals(result)) {
+                	String blame = "";
+                	Set<User> culprits = run.getCulprits();
+                	for (User user : culprits) {
+                		if (blame.length() > 0) blame += ", ";
+						blame += user.getDisplayName();
+					}
+                	String blameMsg = "BLAME: "+blame;
+                	listener.getLogger().println("Telling Lamp display: " + blameMsg);
+                	sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), blameMsg);
+                } else if (Result.ABORTED.equals(result)) {
+                	String causeMsg = "BUILD ABORTED";
+                	listener.getLogger().println("Telling Lamp display: " + causeMsg);
+					sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), causeMsg);
+                } else {
+                	sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), result.toString());
+                }
 
                 if (lamp.isSfx()) {
                     try {
@@ -150,7 +174,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
     private void sendLCDTextNotification(String ipAddress, String lineOne, String lineTwo) {
         JSONObject displayText = new JSONObject();
-        LinkedHashMap lcdText = new LinkedHashMap();
+        LinkedHashMap<String, String> lcdText = new LinkedHashMap<String, String>();
         lcdText.put("line_one", lineOne);
         lcdText.put("line_two", lineTwo);
         displayText.put("lcd_text", lcdText);
