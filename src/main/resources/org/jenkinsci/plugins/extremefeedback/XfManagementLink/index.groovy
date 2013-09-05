@@ -10,9 +10,10 @@ def st=namespace("jelly:stapler")
 l.layout() {
     l.header() {
         st.bind(var: "it", value: my)
-        script(src: "/plugin/extreme-feedback/angular.min.js")
-        script(src: "/plugin/extreme-feedback/findlamps.js")
-        link(rel: "stylesheet", type: "text/css", href:"/plugin/extreme-feedback/style.css")
+
+        script(src: "${rootURL}/plugin/extreme-feedback/angular.min.js")
+        script(src: "${rootURL}/plugin/extreme-feedback/findlamps.js")
+        link(rel: "stylesheet", type: "text/css", href:"${rootURL}/plugin/extreme-feedback/style.css")
     }
     l.main_panel() {
         div(id:"xf-app-container", "ng-app": "xfApp") {
