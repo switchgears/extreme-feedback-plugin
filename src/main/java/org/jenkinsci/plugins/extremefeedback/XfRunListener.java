@@ -27,7 +27,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
 
-   
+
     @Override
     public void onCompleted(AbstractBuild run, TaskListener listener) {
         Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
@@ -43,24 +43,23 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
 
-                
-                
+
                 if (Result.FAILURE.equals(result)) {
-                	String blame = "";
-                	Set<User> culprits = run.getCulprits();
-                	for (User user : culprits) {
-                		if (blame.length() > 0) blame += ", ";
-						blame += user.getDisplayName();
-					}
-                	String blameMsg = "BLAME: "+blame;
-                	listener.getLogger().println("Telling Lamp display: " + blameMsg);
-                	sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), blameMsg);
+                    String blame = "";
+                    Set<User> culprits = run.getCulprits();
+                    for (User user : culprits) {
+                        if (blame.length() > 0) blame += ", ";
+                        blame += user.getDisplayName();
+                    }
+                    String blameMsg = "BLAME:\n" + blame;
+                    listener.getLogger().println("Telling Lamp display: " + blameMsg);
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + '\n' + result.toString() + blameMsg);
                 } else if (Result.ABORTED.equals(result)) {
-                	String causeMsg = "BUILD ABORTED";
-                	listener.getLogger().println("Telling Lamp display: " + causeMsg);
-					sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), causeMsg);
+                    String causeMsg = "BUILD ABORTED";
+                    listener.getLogger().println("Telling Lamp display: " + causeMsg);
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\n" + causeMsg);
                 } else {
-                	sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), result.toString());
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\n" + result.toString());
                 }
 
                 if (lamp.isSfx()) {
@@ -105,7 +104,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                     sendColorNotification(lamp.getIpAddress(), States.Color.GREEN, States.Action.SOLID);
-                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), "Started");
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
 
                 }
             } else {
@@ -114,7 +113,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                     sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(previousBuild.getResult()), States.Action.FLASHING);
-                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName(), "Started");
+                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
 
                 }
             }
@@ -172,11 +171,8 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         UdpMessageSender.send(ipAddress, port, data);
     }
 
-    private void sendLCDTextNotification(String ipAddress, String lineOne, String lineTwo) {
+    private void sendLCDTextNotification(String ipAddress, String lcdText) {
         JSONObject displayText = new JSONObject();
-        LinkedHashMap<String, String> lcdText = new LinkedHashMap<String, String>();
-        lcdText.put("line_one", lineOne);
-        lcdText.put("line_two", lineTwo);
         displayText.put("lcd_text", lcdText);
         byte[] data = displayText.toString(2).getBytes();
         int port = 39418;
