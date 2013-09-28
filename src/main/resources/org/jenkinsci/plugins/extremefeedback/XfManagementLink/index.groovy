@@ -88,6 +88,9 @@ l.layout() {
                                 text("Jobs Assigned To")
                             }
                             th {
+                                text("Aggregate")
+                            }
+                            th {
                                 text("Alarm")
                             }
                             th {
@@ -129,6 +132,9 @@ l.layout() {
                                         }
                                     }
                                 }
+                            }
+                            td {
+                                input(type: "checkbox", "ng-model": "lamp.aggregate", "ng-change": "changeLamp(lamp)")
                             }
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.noisy", "ng-change": "changeLamp(lamp)")

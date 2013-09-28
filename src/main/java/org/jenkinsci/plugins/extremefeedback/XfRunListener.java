@@ -1,10 +1,7 @@
 package org.jenkinsci.plugins.extremefeedback;
 
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -30,24 +27,47 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             Result result = run.getResult();
             Set<Lamp> activeLamps = plugin.getLampsContainingJob(run.getParent().getName());
             for (Lamp lamp : activeLamps) {
-                String jsonColor = buildColorJson(States.resultColorMap.get(result).toString(), lamp, false);
-                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+                Result lampResult = result;
 
-                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(result), States.Action.SOLID);
+                String jsonColor = buildColorJson(States.resultColorMap.get(lampResult).toString(), lamp, false);
+                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
+
+                if (lamp.isAggregate()) {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    for (String jobName : lamp.getJobs()) {
+                        TopLevelItem item = Jenkins.getInstance().getItem(jobName);
+                        if (item instanceof AbstractProject) {
+                            AbstractProject job = (AbstractProject) item;
+                            Result lastResult = job.getLastBuild().getResult();
+                            if (lastResult.isWorseThan(lampResult)) {
+                                lampResult = lastResult;
+                            }
+                        }
+                    }
+                }
+
+                jsonColor = buildColorJson(States.resultColorMap.get(lampResult).toString(), lamp, false);
+                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
 
                 if (lamp.isSfx()) {
                     try {
                         Thread.sleep(1000);
-                        String jsonSfx = buildSfxJson(States.resultColorMap.get(result).toString(), lamp);
+                        String jsonSfx = buildSfxJson(States.resultColorMap.get(lampResult).toString(), lamp);
                         plugin.getEventBus().post(new JenkinsEvent(jsonSfx));
 
-                        sendSfxNotification(lamp.getIpAddress(), States.resultColorMap.get(result));
+                        sendSfxNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
 
-                if (States.resultColorMap.get(result).equals(States.Color.RED) && lamp.isNoisy()) {
+                if (States.resultColorMap.get(lampResult).equals(States.Color.RED) && lamp.isNoisy()) {
                     try {
                         Thread.sleep(1000);
                         String jsonBuzzer = buildBuzzerJson(lamp);

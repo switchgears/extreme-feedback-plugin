@@ -18,6 +18,7 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     private boolean noisy;
     private boolean sfx;
     private boolean inactive;
+    private boolean aggregate;
 
     public Lamp(String macAddress, String ipAddress) {
         this.macAddress = macAddress;
@@ -25,7 +26,7 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     }
 
     @DataBoundConstructor
-    public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy, boolean sfx, boolean inactive) {
+    public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy, boolean sfx, boolean inactive, boolean aggregate) {
         this.ipAddress = ipAddress;
         this.macAddress = macAddress;
         this.name = name;
@@ -33,6 +34,7 @@ public class Lamp implements Comparable<Lamp>, Serializable {
         this.noisy = noisy;
         this.sfx = sfx;
         this.inactive = inactive;
+        this.aggregate = aggregate;
     }
 
     public String getIpAddress() {
@@ -105,6 +107,14 @@ public class Lamp implements Comparable<Lamp>, Serializable {
 
     public void removeJob(String job) {
         this.jobs.remove(job);
+    }
+
+    public boolean isAggregate() {
+        return aggregate;
+    }
+
+    public void setAggregate(boolean aggregate) {
+        this.aggregate = aggregate;
     }
 
     @Override
