@@ -43,7 +43,13 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                         TopLevelItem item = Jenkins.getInstance().getItem(jobName);
                         if (item instanceof AbstractProject) {
                             AbstractProject job = (AbstractProject) item;
-                            Result lastResult = job.getLastBuild().getResult();
+                            Result lastResult;
+                            if (job.getLastBuild() != null) {
+                                lastResult = job.getLastBuild().getResult();
+                            } else {
+                                lastResult = Result.SUCCESS;
+                            }
+
                             if (lastResult.isWorseThan(lampResult)) {
                                 lampResult = lastResult;
                             }
