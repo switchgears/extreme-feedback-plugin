@@ -94,6 +94,9 @@ l.layout() {
                                 text("Alarm")
                             }
                             th {
+                                text("Blame")
+                            }
+                            th {
                                 text("SFX")
                             }
                             th {
@@ -138,6 +141,9 @@ l.layout() {
                             }
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.noisy", "ng-change": "changeLamp(lamp)")
+                            }
+                            td {
+                                input(type: "checkbox", "ng-model": "lamp.blame", "ng-change": "changeLamp(lamp)")
                             }
                             td {
                                 input(type: "checkbox", "ng-model": "lamp.sfx", "ng-change": "changeLamp(lamp)")
