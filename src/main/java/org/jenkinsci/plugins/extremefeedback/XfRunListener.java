@@ -26,7 +26,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
     public void onCompleted(AbstractBuild run, TaskListener listener) {
         Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
         Set<String> jobs = plugin.getJobs();
-        String jobName = run.getParent().getName();
+        String jobName = run.getParent().getFullName();
 
         if (jobs.contains(jobName)) {
             Result result = run.getResult();
