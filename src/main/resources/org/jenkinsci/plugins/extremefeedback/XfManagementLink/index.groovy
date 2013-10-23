@@ -7,7 +7,7 @@ def l=namespace(LayoutTagLib)
 def t=namespace(JenkinsTagLib)
 def st=namespace("jelly:stapler")
 
-l.layout() {
+l.layout(norefresh: true) {
     l.header() {
         st.bind(var: "it", value: my)
 
