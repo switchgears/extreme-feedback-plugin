@@ -7,10 +7,7 @@ import hudson.model.*;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.extremefeedback.model.JenkinsEvent;
-import org.jenkinsci.plugins.extremefeedback.model.Lamp;
-import org.jenkinsci.plugins.extremefeedback.model.States;
-import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
+import org.jenkinsci.plugins.extremefeedback.model.*;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -27,6 +24,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         Lamps plugin = Lamps.getInstance();
         Set<String> jobs = plugin.getJobs();
         String jobName = run.getParent().getFullName();
+        XfEventMessage xfEventMessage = new XfEventMessage();
 
         if (jobs.contains(jobName)) {
             Result result = run.getResult();
@@ -34,9 +32,8 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             for (Lamp lamp : activeLamps) {
                 Result lampResult = result;
 
-                String jsonColor = buildColorJson(States.resultColorMap.get(lampResult).toString(), lamp, false);
-                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
+                xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
 
                 if (lamp.isAggregate()) {
                     try {
@@ -60,10 +57,9 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                             }
                         }
                     }
+                    xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
                 }
 
-                jsonColor = buildColorJson(States.resultColorMap.get(lampResult).toString(), lamp, false);
-                plugin.getEventBus().post(new JenkinsEvent(jsonColor));
                 sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
 
                 // Create Notification for LCD
@@ -88,14 +84,14 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     infoMsg.append(result.toString());
                 }
                 sendLCDTextNotification(lamp.getIpAddress(), infoMsg.toString());
+                xfEventMessage.sendLCDMessage(lamp, infoMsg.toString());
 
                 if (lamp.isSfx()) {
                     try {
                         Thread.sleep(1000);
-                        String jsonSfx = buildSfxJson(States.resultColorMap.get(lampResult).toString(), lamp);
-                        plugin.getEventBus().post(new JenkinsEvent(jsonSfx));
 
                         sendSfxNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult));
+                        xfEventMessage.sendSfxMessage(lamp, lampResult);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -104,10 +100,9 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 if (States.resultColorMap.get(lampResult).equals(States.Color.RED) && lamp.isNoisy()) {
                     try {
                         Thread.sleep(1000);
-                        String jsonBuzzer = buildBuzzerJson(lamp);
-                        plugin.getEventBus().post(new JenkinsEvent(jsonBuzzer));
 
                         sendAlarmNotification(lamp.getIpAddress());
+                        xfEventMessage.sendBuzzerMessage(lamp);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -121,54 +116,31 @@ public class XfRunListener extends RunListener<AbstractBuild> {
         Lamps plugin = Lamps.getInstance();
         Set<String> jobs = plugin.getJobs();
         String jobName = run.getParent().getName();
+        XfEventMessage xfEventMessage = new XfEventMessage();
 
         if (jobs.contains(jobName)) {
             Set<Lamp> activeLamps = plugin.getLampsContainingJob(jobName);
             Run previousBuild = run.getPreviousBuild();
             if (previousBuild == null) {
                 for (Lamp lamp : activeLamps) {
-                    String jsonColor = buildColorJson(States.Color.GREEN.toString(), lamp, false);
-                    plugin.getEventBus().post(new JenkinsEvent(jsonColor));
+                    xfEventMessage.sendColorMessage(lamp, Result.SUCCESS, States.Action.SOLID);
 
                     sendColorNotification(lamp.getIpAddress(), States.Color.GREEN, States.Action.SOLID);
                     sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
+                    xfEventMessage.sendLCDMessage(lamp, jobName + ' ' + run.getDisplayName() + "\nStarted");
 
                 }
             } else {
                 for (Lamp lamp : activeLamps) {
-                    String jsonColor = buildColorJson(States.resultColorMap.get(previousBuild.getResult()).toString(), lamp, true);
-                    plugin.getEventBus().post(new JenkinsEvent(jsonColor));
 
                     sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(previousBuild.getResult()), States.Action.FLASHING);
                     sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
 
+                    xfEventMessage.sendColorMessage(lamp, previousBuild.getResult(), States.Action.FLASHING);
+                    xfEventMessage.sendLCDMessage(lamp, jobName + ' ' + run.getDisplayName() + "\nStarted");
                 }
             }
         }
-    }
-
-    private String buildBuzzerJson(Lamp lamp) {
-        JSONObject jsonBuzzer = new JSONObject();
-        jsonBuzzer.accumulate("macAddress", lamp.getMacAddress());
-        jsonBuzzer.accumulate("type", "buzzer");
-        return jsonBuzzer.toString() + ",";
-    }
-
-    private String buildColorJson(String color, Lamp lamp, boolean flashing) {
-        JSONObject jsonColor = new JSONObject();
-        jsonColor.accumulate("macAddress", lamp.getMacAddress());
-        jsonColor.accumulate("type", "color");
-        jsonColor.accumulate("color", color);
-        jsonColor.accumulate("flashing", flashing);
-        return jsonColor.toString() + ",";
-    }
-
-    private String buildSfxJson(String color, Lamp lamp) {
-        JSONObject jsonSfx = new JSONObject();
-        jsonSfx.accumulate("macAddress", lamp.getMacAddress());
-        jsonSfx.accumulate("type", "soundalarm");
-        jsonSfx.accumulate("color", color);
-        return jsonSfx.toString() + ",";
     }
 
     private void sendColorNotification(String ipAddress, States.Color color, States.Action action) {
