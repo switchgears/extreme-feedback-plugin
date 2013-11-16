@@ -171,4 +171,9 @@ public class Lamps extends Plugin {
     public EventBus getEventBus() {
         return eventBus;
     }
+
+    public static Lamps getInstance() {
+        return Jenkins.getInstance().getPlugin(Lamps.class);
+    }
+
 }

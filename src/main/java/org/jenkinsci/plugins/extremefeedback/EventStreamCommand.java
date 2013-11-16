@@ -16,7 +16,7 @@ public class EventStreamCommand extends CLICommand {
 
     public EventStreamCommand() {
         super();
-        Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         plugin.getEventBus().register(this);
     }
 

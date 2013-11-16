@@ -24,7 +24,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
     @Override
     public void onCompleted(AbstractBuild run, TaskListener listener) {
-        Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Set<String> jobs = plugin.getJobs();
         String jobName = run.getParent().getFullName();
 
@@ -118,7 +118,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
     @Override
     public void onStarted(AbstractBuild run, TaskListener listener) {
-        Lamps plugin = Jenkins.getInstance().getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Set<String> jobs = plugin.getJobs();
         String jobName = run.getParent().getName();
 

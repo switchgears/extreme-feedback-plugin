@@ -42,13 +42,13 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Set<Lamp> findLamps() {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         return plugin.findLamps();
     }
 
     @JavaScriptMethod
     public boolean updateLamp(Lamp lamp) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Map<String,Lamp> lamps = plugin.getLampsAsMap();
         lamps.put(lamp.getMacAddress(), lamp);
         plugin.setLamps(Sets.newHashSet(lamps.values()));
@@ -63,7 +63,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public boolean setLampAlarm(String macAddress, boolean status) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         for (Lamp lamp : plugin.getLamps()) {
             if (lamp.getMacAddress().equals(macAddress)) {
                 lamp.setNoisy(status);
@@ -81,7 +81,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Set<Lamp> addLampByIpAddress(String ipAddress) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Set<Lamp> before = ImmutableSet.copyOf(plugin.getLamps());
         Set<Lamp> after = ImmutableSet.copyOf(plugin.addLampByIp(ipAddress));
         if (before != after) {
@@ -93,7 +93,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public boolean changeLampName(String macAddress, String name) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Set<Lamp> lamps = plugin.getLamps();
         LOGGER.log(Level.INFO, "MAC to find: " + macAddress);
         for (Lamp lamp : lamps) {
@@ -109,13 +109,13 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Set<Lamp> getLamps() {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         return plugin.getLamps();
     }
 
     @JavaScriptMethod
     public Lamp getLamp(String macAddress) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         for (Lamp lamp : plugin.getLamps()) {
             if (lamp.getMacAddress().equals(macAddress)) {
                 return lamp;
@@ -131,7 +131,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Collection<Lamp> addProjectToLamp(String projectName, String macAddress) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         if (jenkins.getJobNames().contains(projectName)) {
             Map<String, Lamp> lamps = plugin.getLampsAsMap();
             Lamp lamp = lamps.get(macAddress);
@@ -149,7 +149,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Collection<Lamp> removeProjectFromLamp(String projectName, String macAddress) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Map<String, Lamp> lamps = plugin.getLampsAsMap();
         Lamp lamp = lamps.get(macAddress);
         lamp.removeJob(projectName);
@@ -165,7 +165,7 @@ public class XfManagementLink extends ManagementLink {
 
     @JavaScriptMethod
     public Collection<Lamp> removeLamp(String macAddress) {
-        Lamps plugin = jenkins.getPlugin(Lamps.class);
+        Lamps plugin = Lamps.getInstance();
         Map<String, Lamp> lamps = plugin.getLampsAsMap();
         lamps.remove(macAddress);
         plugin.setLamps(Sets.newHashSet(lamps.values()));
