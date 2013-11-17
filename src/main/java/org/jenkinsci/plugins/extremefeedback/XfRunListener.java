@@ -32,7 +32,6 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             for (Lamp lamp : activeLamps) {
                 Result lampResult = result;
 
-                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
                 xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
 
                 if (lamp.isAggregate()) {
@@ -60,8 +59,6 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
                 }
 
-                sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult), States.Action.SOLID);
-
                 // Create Notification for LCD
                 StringBuilder infoMsg = new StringBuilder(64);
                 infoMsg.append(jobName).append(' ').append(run.getDisplayName()).append('\n');
@@ -83,14 +80,11 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 } else {
                     infoMsg.append(result.toString());
                 }
-                sendLCDTextNotification(lamp.getIpAddress(), infoMsg.toString());
                 xfEventMessage.sendLCDMessage(lamp, infoMsg.toString());
 
                 if (lamp.isSfx()) {
                     try {
                         Thread.sleep(1000);
-
-                        sendSfxNotification(lamp.getIpAddress(), States.resultColorMap.get(lampResult));
                         xfEventMessage.sendSfxMessage(lamp, lampResult);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -100,8 +94,6 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 if (States.resultColorMap.get(lampResult).equals(States.Color.RED) && lamp.isNoisy()) {
                     try {
                         Thread.sleep(1000);
-
-                        sendAlarmNotification(lamp.getIpAddress());
                         xfEventMessage.sendBuzzerMessage(lamp);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -124,59 +116,15 @@ public class XfRunListener extends RunListener<AbstractBuild> {
             if (previousBuild == null) {
                 for (Lamp lamp : activeLamps) {
                     xfEventMessage.sendColorMessage(lamp, Result.SUCCESS, States.Action.SOLID);
-
-                    sendColorNotification(lamp.getIpAddress(), States.Color.GREEN, States.Action.SOLID);
-                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
                     xfEventMessage.sendLCDMessage(lamp, jobName + ' ' + run.getDisplayName() + "\nStarted");
 
                 }
             } else {
                 for (Lamp lamp : activeLamps) {
-
-                    sendColorNotification(lamp.getIpAddress(), States.resultColorMap.get(previousBuild.getResult()), States.Action.FLASHING);
-                    sendLCDTextNotification(lamp.getIpAddress(), jobName + ' ' + run.getDisplayName() + "\nStarted");
-
                     xfEventMessage.sendColorMessage(lamp, previousBuild.getResult(), States.Action.FLASHING);
                     xfEventMessage.sendLCDMessage(lamp, jobName + ' ' + run.getDisplayName() + "\nStarted");
                 }
             }
         }
     }
-
-    private void sendColorNotification(String ipAddress, States.Color color, States.Action action) {
-        JSONObject gitgear = new JSONObject();
-        gitgear.put("color", color);
-        gitgear.put("action", action);
-        byte[] data = gitgear.toString(2).getBytes();
-        int port = 39418;
-        UdpMessageSender.send(ipAddress, port, data);
-    }
-
-    private void sendAlarmNotification(String ipAddress) {
-        JSONObject gitgear = new JSONObject();
-        gitgear.put("siren", "NA");
-        gitgear.put("action", "ON");
-        byte[] data = gitgear.toString(2).getBytes();
-        int port = 39418;
-        UdpMessageSender.send(ipAddress, port, data);
-    }
-
-    private void sendSfxNotification(String ipAddress, States.Color color) {
-        JSONObject gitgear = new JSONObject();
-        gitgear.put("soundeffect", "NA");
-        gitgear.put("color", color);
-        byte[] data = gitgear.toString(2).getBytes();
-        int port = 39418;
-        UdpMessageSender.send(ipAddress, port, data);
-    }
-
-    private void sendLCDTextNotification(String ipAddress, String lcdText) {
-        JSONObject displayText = new JSONObject();
-        displayText.put("lcd_text", lcdText);
-        byte[] data = displayText.toString(2).getBytes();
-        int port = 39418;
-        UdpMessageSender.send(ipAddress, port, data);
-    }
-
-
 }

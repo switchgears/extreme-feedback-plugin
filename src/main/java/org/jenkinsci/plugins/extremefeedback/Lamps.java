@@ -27,10 +27,12 @@ public class Lamps extends Plugin {
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
     transient private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
     transient private EventBus eventBus = new EventBus("extreme-feedback");
+    private EventMessageHandler eventMessageHandler;
 
     @Override
     public void start() throws Exception {
         load();
+        eventMessageHandler = EventMessageHandler.getInstance();
     }
 
     public Set<Lamp> findLamps() {
@@ -166,6 +168,12 @@ public class Lamps extends Plugin {
             result.put(lamp.getMacAddress(), lamp);
         }
         return result;
+    }
+
+    public String getLampByMacAddress(String macAddress) {
+        Map<String, Lamp> lamps = getLampsAsMap();
+        Lamp lamp = lamps.get(macAddress);
+        return lamp.getIpAddress();
     }
 
     public EventBus getEventBus() {
