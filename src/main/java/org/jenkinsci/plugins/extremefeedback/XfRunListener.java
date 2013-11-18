@@ -45,6 +45,9 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                             blame.add(user.getDisplayName());
                         }
                     }
+                    if (blame.isEmpty()) {
+                        blame.add("Somebody");
+                    }
                     infoMsg.insert(0, Joiner.on(", ").join(blame) + " broke the build: ");
                     infoMsg.append(result.toString());
                     listener.getLogger().println("[XFD] Updating Lamp display: " + infoMsg.toString());
