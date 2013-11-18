@@ -52,6 +52,7 @@ public class XfManagementLink extends ManagementLink {
         Map<String,Lamp> lamps = plugin.getLampsAsMap();
         lamps.put(lamp.getMacAddress(), lamp);
         plugin.setLamps(Sets.newHashSet(lamps.values()));
+        plugin.updateAggregateStatus(lamp);
         try {
             plugin.save();
         } catch (IOException e) {
@@ -137,6 +138,7 @@ public class XfManagementLink extends ManagementLink {
             Lamp lamp = lamps.get(macAddress);
             lamp.addJob(projectName);
             plugin.setLamps(Sets.newHashSet(lamps.values()));
+            plugin.updateJobStatus(lamp, projectName);
             try {
                 plugin.save();
             } catch (IOException e) {
@@ -154,6 +156,7 @@ public class XfManagementLink extends ManagementLink {
         Lamp lamp = lamps.get(macAddress);
         lamp.removeJob(projectName);
         plugin.setLamps(Sets.newHashSet(lamps.values()));
+        plugin.updateAggregateStatus(lamp);
         try {
             plugin.save();
         } catch (IOException e) {

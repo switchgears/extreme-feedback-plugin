@@ -34,31 +34,6 @@ public class XfRunListener extends RunListener<AbstractBuild> {
 
                 xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
 
-                if (lamp.isAggregate()) {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    for (String lampJob : lamp.getJobs()) {
-                        TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
-                        if (item instanceof AbstractProject) {
-                            AbstractProject job = (AbstractProject) item;
-                            Result lastResult;
-                            if (job.getLastBuild() != null) {
-                                lastResult = job.getLastBuild().getResult();
-                            } else {
-                                lastResult = Result.SUCCESS;
-                            }
-
-                            if (lastResult.isWorseThan(lampResult)) {
-                                lampResult = lastResult;
-                            }
-                        }
-                    }
-                    xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
-                }
-
                 // Create Notification for LCD
                 StringBuilder infoMsg = new StringBuilder(64);
                 infoMsg.append(jobName).append(' ').append(run.getDisplayName()).append('\n');
@@ -98,6 +73,14 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+                if (lamp.isAggregate()) {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    plugin.updateAggregateStatus(lamp);
                 }
             }
         }
