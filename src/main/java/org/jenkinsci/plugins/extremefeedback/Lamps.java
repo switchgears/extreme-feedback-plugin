@@ -171,13 +171,17 @@ public class Lamps extends Plugin {
                 TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
                 if (item instanceof AbstractProject) {
                     AbstractProject job = (AbstractProject) item;
-                    Result lastResult;
+                    Result lastResult = Result.SUCCESS;
                     if (job.getLastBuild() != null) {
                         lastResult = job.getLastBuild().getResult();
-                    } else {
-                        lastResult = Result.SUCCESS;
+                        if (lastResult == null) {
+                            lastResult = Result.SUCCESS;
+                        }
                     }
-
+                    if (job.isBuilding()){
+//                        xfEventMessage.sendColorMessage(lamp, lastResult, States.Action.FLASHING);
+                        return;
+                    }
                     if (lastResult.isWorseThan(lampResult)) {
                         lampResult = lastResult;
                     }
@@ -190,14 +194,19 @@ public class Lamps extends Plugin {
     public void updateJobStatus(Lamp lamp, String jobName){
         TopLevelItem item = Jenkins.getInstance().getItem(jobName);
         Result lastResult = Result.SUCCESS;
+        boolean building = false;
         if (item instanceof AbstractProject) {
             AbstractProject job = (AbstractProject) item;
             if (job.getLastBuild() != null) {
                 lastResult = job.getLastBuild().getResult();
+                if (lastResult == null) {
+                    lastResult = Result.SUCCESS;
+                }
+                building = job.isBuilding();
             }
         }
-        xfEventMessage.sendColorMessage(lamp, lastResult, States.Action.SOLID);
-        if (lamp.isAggregate()) {
+        xfEventMessage.sendColorMessage(lamp, lastResult, (building? States.Action.FLASHING : States.Action.SOLID));
+        if (lamp.isAggregate() && !building) {
             // Let it blink if the lamp is aggregating the results and they differ
             try {
                 Thread.sleep(400);
