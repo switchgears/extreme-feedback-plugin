@@ -8,10 +8,11 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.*;
 import hudson.Plugin;
+import hudson.model.AbstractProject;
+import hudson.model.Result;
+import hudson.model.TopLevelItem;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.extremefeedback.model.Lamp;
-import org.jenkinsci.plugins.extremefeedback.model.LampConfirmCallable;
-import org.jenkinsci.plugins.extremefeedback.model.LampFinderCallable;
+import org.jenkinsci.plugins.extremefeedback.model.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,10 +28,13 @@ public class Lamps extends Plugin {
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
     transient private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
     transient private EventBus eventBus = new EventBus("extreme-feedback");
+    private EventMessageHandler eventMessageHandler;
+    private XfEventMessage xfEventMessage = new XfEventMessage();
 
     @Override
     public void start() throws Exception {
         load();
+        eventMessageHandler = EventMessageHandler.getInstance();
     }
 
     public Set<Lamp> findLamps() {
@@ -160,6 +164,50 @@ public class Lamps extends Plugin {
         return lamps;
     }
 
+    public void updateAggregateStatus(Lamp lamp) {
+        if (lamp.isAggregate()) {
+            Result lampResult = Result.SUCCESS;
+            for (String lampJob : lamp.getJobs()) {
+                TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
+                if (item instanceof AbstractProject) {
+                    AbstractProject job = (AbstractProject) item;
+                    Result lastResult;
+                    if (job.getLastBuild() != null) {
+                        lastResult = job.getLastBuild().getResult();
+                    } else {
+                        lastResult = Result.SUCCESS;
+                    }
+
+                    if (lastResult.isWorseThan(lampResult)) {
+                        lampResult = lastResult;
+                    }
+                }
+            }
+            xfEventMessage.sendColorMessage(lamp, lampResult, States.Action.SOLID);
+        }
+    }
+
+    public void updateJobStatus(Lamp lamp, String jobName){
+        TopLevelItem item = Jenkins.getInstance().getItem(jobName);
+        Result lastResult = Result.SUCCESS;
+        if (item instanceof AbstractProject) {
+            AbstractProject job = (AbstractProject) item;
+            if (job.getLastBuild() != null) {
+                lastResult = job.getLastBuild().getResult();
+            }
+        }
+        xfEventMessage.sendColorMessage(lamp, lastResult, States.Action.SOLID);
+        if (lamp.isAggregate()) {
+            // Let it blink if the lamp is aggregating the results and they differ
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        updateAggregateStatus(lamp);
+        }
+    }
+
     public Map<String, Lamp> getLampsAsMap() {
         Map<String, Lamp> result = Maps.newHashMap();
         for (Lamp lamp : lamps) {
@@ -168,7 +216,18 @@ public class Lamps extends Plugin {
         return result;
     }
 
+    public String getLampByMacAddress(String macAddress) {
+        Map<String, Lamp> lamps = getLampsAsMap();
+        Lamp lamp = lamps.get(macAddress);
+        return lamp.getIpAddress();
+    }
+
     public EventBus getEventBus() {
         return eventBus;
     }
+
+    public static Lamps getInstance() {
+        return Jenkins.getInstance().getPlugin(Lamps.class);
+    }
+
 }
