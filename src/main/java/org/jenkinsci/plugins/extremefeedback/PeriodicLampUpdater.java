@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Update Lamps periodically
  *
- * Created by Aske Olsson - 2013.-11-20
+ * Created by Aske Olsson - 2013-11-20
  */
 @Extension
 public class PeriodicLampUpdater extends AsyncPeriodicWork {

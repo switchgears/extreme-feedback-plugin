@@ -4,9 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.extremefeedback.model.*;
 
-import java.util.logging.Logger;
-
-
 /**
  * Event message handler for sending UDP messages.
  * Listens to the event bus and sends udp messages to the lamp accordingly.
