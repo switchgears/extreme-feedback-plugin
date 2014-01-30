@@ -10,15 +10,13 @@ import com.google.common.util.concurrent.*;
 import hudson.Plugin;
 import hudson.model.AbstractProject;
 import hudson.model.Result;
+import hudson.model.Run;
 import hudson.model.TopLevelItem;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.extremefeedback.model.*;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -229,6 +227,38 @@ public class Lamps extends Plugin {
         Map<String, Lamp> lamps = getLampsAsMap();
         Lamp lamp = lamps.get(macAddress);
         return lamp.getIpAddress();
+    }
+
+    // Find the job that ran last time
+    public String getLastJob(Set<String> lampJobs) {
+        Date newest = new Date(0);
+        String project = "";
+        for (String lampJob : lampJobs) {
+            TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
+            if (item instanceof AbstractProject) {
+                AbstractProject job = (AbstractProject) item;
+                Run current = job.getLastBuild();
+                Date date = new Date(current.getTimeInMillis() + current.getDuration());
+                if (date.after(newest)) {
+                    newest = date;
+                    project = job.getFullName();
+                }
+            }
+        }
+        return project;
+    }
+
+    public boolean isBuilding(Lamp lamp) {
+        for (String lampJob : lamp.getJobs()) {
+            TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
+            if (item instanceof AbstractProject) {
+                AbstractProject job = (AbstractProject) item;
+                if (job.isBuilding()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public EventBus getEventBus() {
