@@ -25,14 +25,7 @@ public class PeriodicLampUpdater extends AsyncPeriodicWork {
         Lamps plugin = Lamps.getInstance();
         Set<Lamp> lamps = plugin.getLamps();
         for (Lamp lamp : lamps) {
-            if (lamp.isAggregate() && !plugin.isBuilding(lamp)) {
-                plugin.updateAggregateStatus(lamp);
-            }
-            else {
-                // figure out the last job that ran for the lamp
-                String lastJob = plugin.getLastJob(lamp.getJobs());
-                plugin.updateJobStatus(lamp, lastJob);
-            }
+            plugin.updateLampStatus(lamp);
         }
     }
 

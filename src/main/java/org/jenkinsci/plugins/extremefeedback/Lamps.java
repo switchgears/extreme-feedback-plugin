@@ -230,7 +230,7 @@ public class Lamps extends Plugin {
     }
 
     // Find the job that ran last time
-    public String getLastJob(Set<String> lampJobs) {
+    private String getLastJob(Set<String> lampJobs) {
         Date newest = new Date(0);
         String project = "";
         for (String lampJob : lampJobs) {
@@ -248,7 +248,7 @@ public class Lamps extends Plugin {
         return project;
     }
 
-    public boolean isBuilding(Lamp lamp) {
+    private boolean isBuilding(Lamp lamp) {
         for (String lampJob : lamp.getJobs()) {
             TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
             if (item instanceof AbstractProject) {
@@ -269,4 +269,42 @@ public class Lamps extends Plugin {
         return Jenkins.getInstance().getPlugin(Lamps.class);
     }
 
+    public void updateLampStatus(Lamp lamp) {
+        if (isBuilding(lamp)) {
+            updateBuildingLamp(lamp);
+        }
+        else if (lamp.isAggregate()) {
+            updateAggregateStatus(lamp);
+        }
+        else {
+            updateLatestStatus(lamp);
+        }
+
+    }
+
+    private void updateLatestStatus(Lamp lamp) {
+        String job = getLastJob(lamp.getJobs());
+        updateJobStatus(lamp, job);
+    }
+
+    private void updateBuildingLamp(Lamp lamp) {
+        Date newest = new Date(0);
+        String project = "";
+        for (String lampJob : lamp.getJobs()) {
+            TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
+            if (item instanceof AbstractProject) {
+                AbstractProject job = (AbstractProject) item;
+                if (job.isBuilding()) {
+                    Date date = job.getLastBuild().getTime();
+                    if (date.after(newest)) {
+                        newest = date;
+                        project = job.getFullName();
+                    }
+                }
+            }
+        }
+        if (!project.isEmpty()) {
+            updateJobStatus(lamp, project);
+        }
+    }
 }
