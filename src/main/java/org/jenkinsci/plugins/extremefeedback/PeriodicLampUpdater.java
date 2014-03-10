@@ -31,7 +31,7 @@ public class PeriodicLampUpdater extends AsyncPeriodicWork {
 
     @Override
     public long getRecurrencePeriod() {
-        // Run every 5 minutes
-        return 5*60*1000;
+        // Run every minute
+        return 1*60*1000;
     }
 }
