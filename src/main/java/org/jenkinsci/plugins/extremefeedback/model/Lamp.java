@@ -26,6 +26,10 @@ public class Lamp implements Comparable<Lamp>, Serializable {
         this.ipAddress = ipAddress;
     }
 
+    public Lamp(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
     @DataBoundConstructor
     public Lamp(String ipAddress, String macAddress, String name, String[] jobs, boolean noisy, boolean sfx, boolean inactive, boolean aggregate, boolean blame) {
         this.ipAddress = ipAddress;

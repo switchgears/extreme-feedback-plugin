@@ -34,6 +34,7 @@ public class Lamps extends Plugin {
     public void start() throws Exception {
         load();
         EventMessageHandler.getInstance().start();
+        ZeroMQMessageHandler.getInstance().start();
     }
 
     public Set<Lamp> findLamps() {

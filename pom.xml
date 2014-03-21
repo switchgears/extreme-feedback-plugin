@@ -50,6 +50,11 @@
             <artifactId>jna</artifactId>
             <version>3.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.3.2</version>
+        </dependency>
     </dependencies>
 
     <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
