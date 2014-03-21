@@ -28,13 +28,12 @@ public class Lamps extends Plugin {
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
     transient private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
     transient private EventBus eventBus = new EventBus("extreme-feedback");
-    private EventMessageHandler eventMessageHandler;
     private XfEventMessage xfEventMessage = new XfEventMessage();
 
     @Override
     public void start() throws Exception {
         load();
-        eventMessageHandler = EventMessageHandler.getInstance();
+        EventMessageHandler.getInstance().start();
     }
 
     public Set<Lamp> findLamps() {

@@ -2,9 +2,10 @@ package org.jenkinsci.plugins.extremefeedback;
 
 import com.google.common.eventbus.Subscribe;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.extremefeedback.model.*;
-
-import java.util.logging.Logger;
+import org.jenkinsci.plugins.extremefeedback.model.JenkinsEvent;
+import org.jenkinsci.plugins.extremefeedback.model.States;
+import org.jenkinsci.plugins.extremefeedback.model.UdpMessageSender;
+import org.jenkinsci.plugins.extremefeedback.model.XfEventMessage;
 
 
 /**
@@ -17,10 +18,16 @@ import java.util.logging.Logger;
 public class EventMessageHandler {
 
     private static final int PORT = 39418;
+    private boolean isStarted = false;
 
-    private EventMessageHandler() {
-        Lamps plugin = Lamps.getInstance();
-        plugin.getEventBus().register(this);
+    private EventMessageHandler() {}
+
+    public void start() {
+        if (!isStarted) {
+            isStarted = true;
+            Lamps plugin = Lamps.getInstance();
+            plugin.getEventBus().register(this);
+        }
     }
 
     private static class EventMessageObject {
