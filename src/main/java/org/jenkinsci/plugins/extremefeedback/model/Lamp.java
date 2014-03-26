@@ -22,12 +22,12 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     private boolean blame;
 
     public Lamp(String macAddress, String ipAddress) {
-        this.macAddress = macAddress;
-        this.ipAddress = ipAddress;
+        this.macAddress = macAddress.trim();
+        this.ipAddress = ipAddress.trim();
     }
 
     public Lamp(String macAddress) {
-        this.macAddress = macAddress;
+        this.macAddress = macAddress.trim();
     }
 
     @DataBoundConstructor
@@ -103,8 +103,8 @@ public class Lamp implements Comparable<Lamp>, Serializable {
         this.jobs.addAll(jobs);
     }
 
-    public int compareTo(Lamp o) {
-        return this.macAddress.compareTo(o.getMacAddress());
+    public int compareTo(Lamp other) {
+        return this.macAddress.compareTo(other.getMacAddress());
     }
 
     public void addJob(String job) {

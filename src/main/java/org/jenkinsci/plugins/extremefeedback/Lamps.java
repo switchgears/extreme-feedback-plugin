@@ -230,4 +230,7 @@ public class Lamps extends Plugin {
         return Jenkins.getInstance().getPlugin(Lamps.class);
     }
 
+    public void addLampByMacAddress(String macAddress) {
+        lamps.add(new Lamp(macAddress));
+    }
 }

@@ -45,6 +45,13 @@ public class EventMessageHandler {
 
     private void handleEvent(String event) {
         JSONObject json = JSONObject.fromObject(event);
+        String message = convertJson(json);
+        if ( !message.isEmpty()) {
+            sendMessage(json.getString("macAddress"), message);
+        }
+    }
+
+    public static String convertJson(JSONObject json) {
         String type = json.getString("type");
         String message = "";
         if (type.equals(XfEventMessage.Type.buzzer.toString())) {
@@ -58,35 +65,32 @@ public class EventMessageHandler {
 
         } else if (type.equals(XfEventMessage.Type.lcdtext.toString())) {
             message = buildLCDNotification(json.getString("text"));
-
         }
-        if ( !message.isEmpty()) {
-            sendMessage(json.getString("macAddress"), message);
-        }
+        return message;
     }
 
-    private String buildColorNotification(String color, String flashing) {
+    private static String buildColorNotification(String color, String flashing) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("color", color);
         gitgear.put("action", flashing.equals("true") ? States.Action.FLASHING : States.Action.SOLID);
         return gitgear.toString();
     }
 
-    private String buildAlarmNotification() {
+    private static String buildAlarmNotification() {
         JSONObject gitgear = new JSONObject();
         gitgear.put("siren", "NA");
         gitgear.put("action", "ON");
         return gitgear.toString();
     }
 
-    private String buildSfxNotification(String color) {
+    private static String buildSfxNotification(String color) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("soundeffect", "NA");
         gitgear.put("color", color);
         return gitgear.toString();
     }
 
-    private String buildLCDNotification(String lcdText) {
+    private static String buildLCDNotification(String lcdText) {
         JSONObject displayText = new JSONObject();
         displayText.put("lcd_text", lcdText);
         return displayText.toString();
