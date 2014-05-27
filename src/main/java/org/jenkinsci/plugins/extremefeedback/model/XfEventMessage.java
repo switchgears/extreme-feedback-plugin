@@ -40,6 +40,7 @@ public class XfEventMessage {
         JSONObject jsonBuzzer = new JSONObject();
         jsonBuzzer.accumulate("macAddress", lamp.getMacAddress());
         jsonBuzzer.accumulate("type", Type.buzzer);
+        jsonBuzzer.accumulate("name", lamp.getName() != null? lamp.getName(): lamp.getMacAddress());
         return jsonBuzzer.toString();
     }
 
@@ -49,6 +50,7 @@ public class XfEventMessage {
         jsonColor.accumulate("type", Type.color);
         jsonColor.accumulate("color", color);
         jsonColor.accumulate("flashing", flashing);
+        jsonColor.accumulate("name", lamp.getName() != null? lamp.getName(): lamp.getMacAddress());
         return jsonColor.toString();
     }
 
@@ -57,6 +59,7 @@ public class XfEventMessage {
         jsonSfx.accumulate("macAddress", lamp.getMacAddress());
         jsonSfx.accumulate("type", Type.soundalarm);
         jsonSfx.accumulate("color", color);
+        jsonSfx.accumulate("name", lamp.getName() != null? lamp.getName(): lamp.getMacAddress());
         return jsonSfx.toString();
     }
 
@@ -65,6 +68,7 @@ public class XfEventMessage {
         jsonLcd.accumulate("macAddress", lamp.getMacAddress());
         jsonLcd.accumulate("type", Type.lcdtext);
         jsonLcd.accumulate("text", lcdText);
+        jsonLcd.accumulate("name", lamp.getName() != null? lamp.getName(): lamp.getMacAddress());
         return jsonLcd.toString();
     }
 
