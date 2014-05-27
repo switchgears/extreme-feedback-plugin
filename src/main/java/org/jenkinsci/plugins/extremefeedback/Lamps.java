@@ -170,8 +170,8 @@ public class Lamps extends Plugin {
                 if (item instanceof AbstractProject) {
                     AbstractProject job = (AbstractProject) item;
                     Result lastResult = Result.SUCCESS;
-                    if (job.getLastBuild() != null) {
-                        lastResult = job.getLastBuild().getResult();
+                    if (job.getLastCompletedBuild() != null) {
+                        lastResult = job.getLastCompletedBuild().getResult();
                         if (lastResult == null) {
                             lastResult = Result.SUCCESS;
                         }
@@ -195,8 +195,8 @@ public class Lamps extends Plugin {
         boolean building = false;
         if (item instanceof AbstractProject) {
             AbstractProject job = (AbstractProject) item;
-            if (job.getLastBuild() != null) {
-                lastResult = job.getLastBuild().getResult();
+            if (job.getLastCompletedBuild() != null) {
+                lastResult = job.getLastCompletedBuild().getResult();
                 if (lastResult == null) {
                     lastResult = Result.SUCCESS;
                 }
@@ -211,7 +211,7 @@ public class Lamps extends Plugin {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        updateAggregateStatus(lamp);
+            updateAggregateStatus(lamp);
         }
     }
 
