@@ -20,7 +20,7 @@ public class ZeroMQMessageHandler {
     private static final ZeroMQMessageHandler instance = new ZeroMQMessageHandler();
     private boolean isStarted = false;
 
-    private static final char SEPARATOR = ((char)007);
+    private static final char SEPARATOR = ((char) 7);
 
     private final static Logger LOGGER = Logger.getLogger(ZeroMQMessageHandler.class.getName());
 
@@ -46,7 +46,7 @@ public class ZeroMQMessageHandler {
 
                         while (!Thread.currentThread().isInterrupted()) {
                             String request = responder.recvStr().trim();
-                            String message = "";
+                            String message;
                             synchronized (messages) {
                                 List<String> converted = Lists.newArrayList();
                                 for (String req : messages.get(request)) {
@@ -56,8 +56,6 @@ public class ZeroMQMessageHandler {
                                 message = Joiner.on(SEPARATOR).join(converted);
                             }
                             responder.send(message);
-                            if (!message.isEmpty()) {
-                            }
                             if (message.isEmpty() && !(plugin.getLamps().contains(new Lamp(request)))) {
                                 LOGGER.info("Creating lamp with Mac address " + request);
                                 plugin.addLampByMacAddress(request);
@@ -74,11 +72,18 @@ public class ZeroMQMessageHandler {
     @Subscribe
     public void listenEvents(JenkinsEvent event) {
         String json = event.getJson();
-        JSONObject jsonObject = JSONObject.fromObject(json);
-        LOGGER.info("Event received for " + jsonObject.getString("macAddress"));
-        synchronized (messages) {
-            messages.put(jsonObject.getString("macAddress"), json);
+        if (json.endsWith(",")) {
+            json = json.substring(0, json.length() - 1);
         }
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        String message = EventMessageHandler.convertJson(jsonObject);
+        if ( !message.isEmpty()) {
+            LOGGER.info("Event received for " + jsonObject.getString("macAddress"));
+            synchronized (messages) {
+                messages.put(jsonObject.getString("macAddress"), json);
+            }
+        }
+
     }
 
 }
