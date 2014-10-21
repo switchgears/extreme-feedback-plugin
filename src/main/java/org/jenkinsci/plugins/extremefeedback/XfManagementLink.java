@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 @Extension
 public class XfManagementLink extends ManagementLink {
 
-    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    private static final Logger LOGGER = Logger.getLogger(XfManagementLink.class.getName());
 
     private final Jenkins jenkins = Jenkins.getInstance();
 
