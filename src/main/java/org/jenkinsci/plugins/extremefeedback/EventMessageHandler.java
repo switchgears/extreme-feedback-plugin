@@ -56,7 +56,7 @@ public class EventMessageHandler {
         }
         if ( !message.isEmpty()) {
             sendMessage(json.getString("macAddress"), message);
-            LOGGER.info("[XFD] "+ message);
+            //LOGGER.info("[XFD] "+ message);
         }
     }
 
@@ -94,7 +94,11 @@ public class EventMessageHandler {
     private void sendMessage(String macAddress, String msg){
         byte[] data = msg.getBytes();
         Lamps plugin = Lamps.getInstance();
-        String ipAddress = plugin.getLampByMacAddress(macAddress);
-        UdpMessageSender.send(ipAddress, PORT, data);
+        Lamp lamp = plugin.getLampByMacAddress(macAddress);
+        if (!lamp.isInactive()) {
+            String ipAddress = lamp.getIpAddress();
+            LOGGER.info("[XFD] sending message to: " + ipAddress + " message: " + msg);
+            UdpMessageSender.send(ipAddress, PORT, data);
+        }
     }
 }

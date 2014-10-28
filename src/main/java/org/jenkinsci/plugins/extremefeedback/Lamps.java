@@ -127,7 +127,7 @@ public class Lamps extends Plugin {
     public Set<Lamp> getLampsContainingJob(String jobName) {
         Set<Lamp> activeLamps = Sets.newHashSet();
         for (Lamp lamp : lamps) {
-            if (lamp.getJobs().contains(jobName)) {
+            if (lamp.getJobs().contains(jobName) && !lamp.isInactive()) {
                 activeLamps.add(lamp);
             }
         }
@@ -223,10 +223,10 @@ public class Lamps extends Plugin {
         return result;
     }
 
-    public String getLampByMacAddress(String macAddress) {
+    public Lamp getLampByMacAddress(String macAddress) {
         Map<String, Lamp> lamps = getLampsAsMap();
         Lamp lamp = lamps.get(macAddress);
-        return lamp.getIpAddress();
+        return lamp;
     }
 
     // Find the job that ran last time
@@ -270,21 +270,26 @@ public class Lamps extends Plugin {
     }
 
     public void updateLampStatus(Lamp lamp) {
-        if (isBuilding(lamp)) {
-            updateBuildingLamp(lamp);
+        if (!lamp.isInactive() && lamp.getJobs().size() > 0) {
+            LOGGER.info("[XFD] Updating lamp: " + lamp.getName() + " ip: " + lamp.getIpAddress() + " jobs: " + lamp.getJobs());
+            if (isBuilding(lamp)) {
+                updateBuildingLamp(lamp);
+            } else if (lamp.isAggregate()) {
+                updateAggregateStatus(lamp);
+            } else {
+                updateLatestStatus(lamp);
+            }
+        } else {
+            LOGGER.info("[XFD] Not updating lamp: " + lamp.getName() + " ip: " + lamp.getIpAddress() + " jobs: " + lamp.getJobs() + " inactive: " + lamp.isInactive());
         }
-        else if (lamp.isAggregate()) {
-            updateAggregateStatus(lamp);
-        }
-        else {
-            updateLatestStatus(lamp);
-        }
-
     }
 
     private void updateLatestStatus(Lamp lamp) {
         String job = getLastJob(lamp.getJobs());
-        updateJobStatus(lamp, job);
+        if (job != "") {
+            //LOGGER.info("[XFD] lamp: " + lamp.getIpAddress() + " last job " + job);
+            updateJobStatus(lamp, job);
+        }
     }
 
     private void updateBuildingLamp(Lamp lamp) {
