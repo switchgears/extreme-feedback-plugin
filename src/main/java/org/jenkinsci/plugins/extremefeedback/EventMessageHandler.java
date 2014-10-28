@@ -17,10 +17,16 @@ public class EventMessageHandler {
 
     private static final int PORT = 39418;
     private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    private boolean isStarted = false;
 
-    private EventMessageHandler() {
-        Lamps plugin = Lamps.getInstance();
-        plugin.getEventBus().register(this);
+    private EventMessageHandler() {}
+
+    public void start() {
+        if (!isStarted) {
+            isStarted = true;
+            Lamps plugin = Lamps.getInstance();
+            plugin.getEventBus().register(this);
+        }
     }
 
     private static class EventMessageObject {
@@ -38,6 +44,13 @@ public class EventMessageHandler {
 
     private void handleEvent(String event) {
         JSONObject json = JSONObject.fromObject(event);
+        String message = convertJson(json);
+        if ( !message.isEmpty()) {
+            sendMessage(json.getString("macAddress"), message);
+        }
+    }
+
+    public static String convertJson(JSONObject json) {
         String type = json.getString("type");
         String name = json.getString("name");
         String message = "";
@@ -52,15 +65,11 @@ public class EventMessageHandler {
 
         } else if (type.equals(XfEventMessage.Type.lcdtext.toString())) {
             message = buildLCDNotification(json.getString("text"), name);
-
         }
-        if ( !message.isEmpty()) {
-            sendMessage(json.getString("macAddress"), message);
-            //LOGGER.info("[XFD] "+ message);
-        }
+        return message;
     }
 
-    private String buildColorNotification(String color, String flashing, String name) {
+    private static String buildColorNotification(String color, String flashing, String name) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("Lamp", name);
         gitgear.put("color", color);
@@ -68,7 +77,7 @@ public class EventMessageHandler {
         return gitgear.toString();
     }
 
-    private String buildAlarmNotification(String name) {
+    private static String buildAlarmNotification(String name) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("Lamp", name);
         gitgear.put("siren", "NA");
@@ -76,7 +85,7 @@ public class EventMessageHandler {
         return gitgear.toString();
     }
 
-    private String buildSfxNotification(String color, String name) {
+    private static String buildSfxNotification(String color, String name) {
         JSONObject gitgear = new JSONObject();
         gitgear.put("Lamp", name);
         gitgear.put("soundeffect", "NA");
@@ -84,7 +93,7 @@ public class EventMessageHandler {
         return gitgear.toString();
     }
 
-    private String buildLCDNotification(String lcdText, String name) {
+    private static String buildLCDNotification(String lcdText, String name) {
         JSONObject displayText = new JSONObject();
         displayText.put("Lamp", name);
         displayText.put("lcd_text", lcdText);
