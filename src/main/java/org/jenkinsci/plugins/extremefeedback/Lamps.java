@@ -248,19 +248,6 @@ public class Lamps extends Plugin {
         return project;
     }
 
-    private boolean isBuilding(Lamp lamp) {
-        for (String lampJob : lamp.getJobs()) {
-            TopLevelItem item = Jenkins.getInstance().getItem(lampJob);
-            if (item instanceof AbstractProject) {
-                AbstractProject job = (AbstractProject) item;
-                if (job.isBuilding()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public EventBus getEventBus() {
         return eventBus;
     }
@@ -272,7 +259,7 @@ public class Lamps extends Plugin {
     public void updateLampStatus(Lamp lamp) {
         if (!lamp.isInactive() && lamp.getJobs().size() > 0) {
             LOGGER.info("[XFD] Updating lamp: " + lamp.getName() + " ip: " + lamp.getIpAddress() + " jobs: " + lamp.getJobs());
-            if (isBuilding(lamp)) {
+            if (lamp.isBuilding()) {
                 updateBuildingLamp(lamp);
             } else if (lamp.isAggregate()) {
                 updateAggregateStatus(lamp);

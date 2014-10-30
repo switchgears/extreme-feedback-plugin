@@ -2,6 +2,9 @@ package org.jenkinsci.plugins.extremefeedback.model;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import hudson.model.AbstractProject;
+import hudson.model.TopLevelItem;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.Serializable;
@@ -148,5 +151,18 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("MAC", macAddress).toString();
+    }
+
+    public boolean isBuilding() {
+        for ( String job : jobs ) {
+            TopLevelItem item = Jenkins.getInstance().getItem(job);
+            if (item instanceof AbstractProject) {
+                AbstractProject project = (AbstractProject) item;
+                if (project.isBuilding()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
