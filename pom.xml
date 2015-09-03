@@ -36,6 +36,17 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>dvaske</id>
+            <name>Aske Olsson</name>
+            <email>aske.olsson@switch-gears.dk</email>
+            <organization>SwitchGears ApS</organization>
+            <url>www.switch-gears.dk</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <scm>
