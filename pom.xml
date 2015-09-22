@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.480.3</version>
+        <version>1.509.3</version>
         <!-- which version of Jenkins is this plugin built against? -->
     </parent>
 
@@ -36,6 +36,17 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>dvaske</id>
+            <name>Aske Olsson</name>
+            <email>aske.olsson@switch-gears.dk</email>
+            <organization>SwitchGears ApS</organization>
+            <url>www.switch-gears.dk</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <scm>
@@ -49,6 +60,16 @@
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
             <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0</version>
         </dependency>
     </dependencies>
 

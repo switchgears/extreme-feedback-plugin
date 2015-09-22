@@ -19,7 +19,7 @@ public class LampFinderCallable implements Callable<TreeSet<Lamp>> {
 
     private static final int PORT = 19418;
     private static final byte[] MESSAGE = "GITGEAR.COM".getBytes();
-    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    private static final Logger LOGGER = Logger.getLogger(LampFinderCallable.class.getName());
 
     public TreeSet<Lamp> call() throws Exception {
         TreeSet<Lamp> lamps = Sets.newTreeSet();

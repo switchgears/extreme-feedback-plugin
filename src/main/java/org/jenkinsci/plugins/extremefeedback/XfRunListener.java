@@ -5,9 +5,9 @@ import com.google.common.collect.Lists;
 import hudson.Extension;
 import hudson.model.*;
 import hudson.model.listeners.RunListener;
-import jenkins.model.Jenkins;
-import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.extremefeedback.model.*;
+import org.jenkinsci.plugins.extremefeedback.model.Lamp;
+import org.jenkinsci.plugins.extremefeedback.model.States;
+import org.jenkinsci.plugins.extremefeedback.model.XfEventMessage;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -16,8 +16,7 @@ import java.util.logging.Logger;
 @Extension
 public class XfRunListener extends RunListener<AbstractBuild> {
 
-    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
-
+    private static final Logger LOGGER = Logger.getLogger(XfRunListener.class.getName());
 
     @Override
     public void onCompleted(AbstractBuild run, TaskListener listener) {
@@ -79,7 +78,7 @@ public class XfRunListener extends RunListener<AbstractBuild> {
                 }
                 if (lamp.isAggregate()) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

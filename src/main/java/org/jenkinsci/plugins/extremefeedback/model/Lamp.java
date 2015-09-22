@@ -2,6 +2,9 @@ package org.jenkinsci.plugins.extremefeedback.model;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import hudson.model.AbstractProject;
+import hudson.model.TopLevelItem;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.Serializable;
@@ -22,8 +25,12 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     private boolean blame;
 
     public Lamp(String macAddress, String ipAddress) {
-        this.macAddress = macAddress;
-        this.ipAddress = ipAddress;
+        this.macAddress = macAddress.trim();
+        this.ipAddress = ipAddress.trim();
+    }
+
+    public Lamp(String macAddress) {
+        this.macAddress = macAddress.trim();
     }
 
     @DataBoundConstructor
@@ -99,8 +106,8 @@ public class Lamp implements Comparable<Lamp>, Serializable {
         this.jobs.addAll(jobs);
     }
 
-    public int compareTo(Lamp o) {
-        return this.macAddress.compareTo(o.getMacAddress());
+    public int compareTo(Lamp other) {
+        return this.macAddress.compareTo(other.getMacAddress());
     }
 
     public void addJob(String job) {
@@ -144,5 +151,18 @@ public class Lamp implements Comparable<Lamp>, Serializable {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).add("MAC", macAddress).toString();
+    }
+
+    public boolean isBuilding() {
+        for ( String job : jobs ) {
+            TopLevelItem item = Jenkins.getInstance().getItem(job);
+            if (item instanceof AbstractProject) {
+                AbstractProject project = (AbstractProject) item;
+                if (project.isBuilding()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
