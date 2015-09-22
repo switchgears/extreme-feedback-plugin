@@ -43,6 +43,9 @@ public class EventMessageHandler {
     }
 
     private void handleEvent(String event) {
+        if (event.endsWith(",")) {
+            event = event.substring(0, event.length() - 1);
+        }
         JSONObject json = JSONObject.fromObject(event);
         String message = convertJson(json);
         if ( !message.isEmpty()) {

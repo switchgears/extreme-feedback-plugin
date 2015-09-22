@@ -24,12 +24,13 @@ import java.util.logging.Logger;
 public class Lamps extends Plugin {
 
     private Set<Lamp> lamps = new ConcurrentSkipListSet<Lamp>();
-    transient private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    transient private static final Logger LOGGER = Logger.getLogger(Lamps.class.getName());
     transient private EventBus eventBus = new EventBus("extreme-feedback");
     private XfEventMessage xfEventMessage = new XfEventMessage();
 
     @Override
     public void start() throws Exception {
+        LOGGER.info("Starting the extreme feedback plugin");
         load();
         EventMessageHandler.getInstance().start();
         ZeroMQMessageHandler.getInstance().start();

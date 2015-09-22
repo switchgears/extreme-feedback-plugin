@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class UdpMessageSender {
 
-    private static final Logger LOGGER = Logger.getLogger("jenkins.plugins.extremefeedback");
+    private static final Logger LOGGER = Logger.getLogger(UdpMessageSender.class.getName());
 
     public static void send(String ipAddress, int port, byte[] data) {
         try {
